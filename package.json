@@ -24,17 +24,17 @@
 		"url": "https://github.com/ahmedheltaher/typed-environment-loader/issues"
 	},
 	"keywords": [
-		"environment",
-		"loader",
-		"typed",
-		"typescript",
-		"node",
-		"tool",
-		"utility",
-		"env",
+		"nodejs",
 		"config",
+		"utility",
+		"environment",
+		"typescript",
+		"tool",
+		"loader",
 		"declarative",
-		"runtime-type-checking"
+		"env",
+		"typed",
+		"runtime-typechecking"
 	],
 	"author": {
 		"email": "ahmedheltaher@gmail.com",
