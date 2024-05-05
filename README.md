@@ -71,6 +71,24 @@ typed-environment-loader provides a simple and intuitive way to load environment
 
 - **Ease of Use**: typed-environment-loader offers a clean and straightforward API for loading environment variables, making it easy to integrate into your projects. Whether you're working on a small project or a large-scale application, typed-environment-loader provides a hassle-free solution for managing your environment configurations.
 
+## Issues
+
+We welcome any contributions or feedback! If you encounter any bugs, have feature requests, or want to ask questions, please don't hesitate to create an issue. We also have specific issue templates to help guide you in providing the necessary information.
+
+### Issue Templates
+
+For your convenience, we have provided issue templates to cover common types of contributions. You can find them in the [`.github/ISSUE_TEMPLATE/`](.github/ISSUE_TEMPLATE/) directory:
+
+- **Bug Report**: Use this template if you've encountered a bug or unexpected behavior in the library.
+- **Feature Request**: Use this template to propose a new feature or enhancement.
+- **Question / Help Wanted**: Use this template if you have questions or need help with using the library.
+
+Please make sure to fill out all the sections in the template relevant to your issue. This will help us understand your request better and address it promptly.
+
+### Contributing
+
+If you'd like to contribute code, please refer to the [Contributing Guidelines](CONTRIBUTING.md) for instructions on how to contribute. We appreciate your help in improving typed-environment-loader!
+
 ## License
 
 typed-environment-loader is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).

@@ -1,17 +1,17 @@
-## Security Policy
+# Security Policy
 
-### Reporting a Vulnerability
+## Reporting a Vulnerability
 
 At Typed Environment Loader, we take security vulnerabilities seriously. If you discover a security issue, please report it to us by emailing [ahmedheltaher@gmail.com](mailto:ahmedheltaher@gmail.com). We will work with you to address the problem promptly.
 
-### Responsible Disclosure
+## Responsible Disclosure
 
 We kindly request that you follow responsible disclosure practices when reporting security vulnerabilities to us. This means:
 
 - Do not publicly disclose the vulnerability until it has been addressed by our team.
 - Provide sufficient details to reproduce the vulnerability, including steps and any necessary proof-of-concept code or screenshots.
 
-### Acknowledgment
+## Acknowledgment
 
 We deeply appreciate the efforts of security researchers and users in identifying and reporting vulnerabilities to us. As a token of our appreciation, we will acknowledge individuals or organizations who responsibly disclose security issues to us.
 

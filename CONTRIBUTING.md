@@ -1,16 +1,12 @@
-**Contributing to Typed Environment Loader**
+# Contributing to Typed Environment Loader
 
 Thank you for considering contributing to the Typed Environment Loader! This guide outlines how you can contribute to this project.
-
-## Code of Conduct
-
-Please note that this project is governed by the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
 
 ## How to Contribute
 
 ### Reporting Bugs
 
-If you encounter a bug while using the Typed Environment Loader, please [open an issue](https://github.com/your-username/typed-environment-loader/issues/new) on GitHub and provide as much detail as possible. Include steps to reproduce the bug and any relevant information about your environment.
+If you encounter a bug while using the Typed Environment Loader, please [open an issue](https://github.com/ahmedheltaher/typed-environment-loader/issues/new) on GitHub and provide as much detail as possible. Include steps to reproduce the bug and any relevant information about your environment.
 
 ### Suggesting Enhancements
 
@@ -37,7 +33,7 @@ To set up a development environment for the Typed Environment Loader, follow the
 
 You can run tests using the following command:
 
-```
+```bash
 npm test
 ```
 
@@ -45,8 +41,10 @@ npm test
 
 Once you've made your changes and they pass the tests, you can submit a pull request. Be sure to include a detailed description of your changes and reference any relevant issues.
 
-## Code of Conduct
+### Code of Conduct
 
-Please remember to adhere to the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md) in all interactions related to this project.
+Please note that this project is governed by the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating in this project, you agree to abide by its terms.
+
+Please remember to adhere to the Code of Conduct in all interactions related to this project.
 
 Thank you for contributing to the Typed Environment Loader! Your help is greatly appreciated.
