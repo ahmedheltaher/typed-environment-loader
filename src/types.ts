@@ -22,7 +22,7 @@ export type Configuration = {
 };
 
 export type NestedConfiguration = {
-	[key: string]: ConfigurationItem<any>;
+	[key: string]: ConfigurationItem<any> | NestedConfiguration;
 };
 
 export interface ParsedConfig {
