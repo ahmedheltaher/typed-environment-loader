@@ -14,7 +14,8 @@
 		"ts:check-types": "tsc",
 		"ts:check-types:watch": "tsc --watch",
 		"check-code": "npm run test && npm run lint && npm run ts:check-types",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prepublish": "npm run clean && npm run build"
 	},
 	"repository": {
 		"type": "git",
