@@ -59,13 +59,15 @@ export class EnvironmentLoader<ResultType extends ParsedConfig> {
 
 		switch (type) {
 			case 'string':
-				return this.parsers.stringParser(value, name);
+				return this.parsers.string(value, name);
 			case 'number':
-				return this.parsers.numberParser(value, name);
+				return this.parsers.number(value, name);
 			case 'boolean':
-				return this.parsers.booleanParser(value, name);
+				return this.parsers.boolean(value, name);
 			case 'enum':
-				return this.parsers.enumParser(value, item.values, name);
+				return this.parsers.enum(value, item.values, name);
+			case 'array':
+				return this.parsers.array(value, item.items, name);
 			default:
 				throw new Error(`Unsupported type ${type}`);
 		}

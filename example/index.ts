@@ -13,6 +13,16 @@ const config: Configuration = {
 		host: { type: 'string', default: 'localhost', required: true, name: 'POSTGRES_HOST' },
 		password: { type: 'string', required: true, name: 'POSTGRES_PASSWORD' },
 		port: { type: 'number', default: 5432, required: true, name: 'POSTGRES_PORT' }
+	},
+	cors: {
+		enabled: { type: 'boolean', default: true, required: true, name: 'CORS_ENABLED' },
+		origins: { type: 'array', items: { type: 'string' }, default: ['*'], required: true, name: 'CORS_ORIGINS' }
+	},
+	matrix: {
+		type: 'array',
+		items: { type: 'array', items: { type: 'number' } },
+		required: false,
+		name: 'MATRIX'
 	}
 };
 
@@ -24,6 +34,11 @@ interface Config extends ParsedConfig {
 		password: string;
 		port: number;
 	};
+	cors: {
+		enabled: boolean;
+		origins: Array<string>;
+	};
+	matrix: Array<Array<number>>;
 }
 
 const loader = new EnvironmentLoader<Config>(config);
