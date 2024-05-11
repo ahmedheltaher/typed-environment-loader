@@ -1,4 +1,3 @@
-import * as dotenv from 'dotenv';
 import { Parsers, parsers } from './parsers';
 import { Configuration, ConfigurationItem, ParsedConfig } from './types';
 
@@ -8,16 +7,6 @@ export class EnvironmentLoader<ResultType extends ParsedConfig> {
 
 	constructor(config: Configuration) {
 		this.config = config;
-	}
-
-	loadFromFile() {
-		const loadedEnv = dotenv.config({});
-		if (loadedEnv.error) {
-			throw new Error(
-				`Error loading environment variables from.env file it must be located in the root of the project.`
-			);
-		}
-		return this;
 	}
 
 	private isConfigItem(value: Configuration | ConfigurationItem<any>): value is ConfigurationItem<any> {

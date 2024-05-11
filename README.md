@@ -17,6 +17,7 @@ npm install typed-environment-loader
 ## Usage
 
 ```typescript
+import * as dotenv from 'dotenv';
 import { Configuration, EnvironmentLoader, ParsedConfig } from 'typed-environment-loader';
 
 const config: Configuration = {
@@ -59,7 +60,12 @@ interface Config extends ParsedConfig {
  };
  matrix: Array<Array<number>>;
 }
-
+const loadedEnv = dotenv.config({});
+if (loadedEnv.error) {
+    throw new Error(
+    `Error loading environment variables from.env file it must be located in the root of the project.`
+    );
+}
 const loader = new EnvironmentLoader<Config>(config);
 const configObject = loader.loadFromFile().load();
 

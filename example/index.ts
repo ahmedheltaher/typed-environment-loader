@@ -41,8 +41,20 @@ interface Config extends ParsedConfig {
 	matrix: Array<Array<number>>;
 }
 
+process.env = {
+	...process.env,
+	PORT: '3000',
+	NODE_ENV: 'development',
+	POSTGRES_HOST: 'localhost',
+	POSTGRES_PASSWORD: '<PASSWORD>',
+	POSTGRES_PORT: '5432',
+	CORS_ENABLED: 'true',
+	CORS_ORIGINS: '["*"]',
+	MATRIX: '[["1", "2"], ["3", "4"]]'
+};
+
 const loader = new EnvironmentLoader<Config>(config);
-const configObject = loader.loadFromFile().load();
+const configObject = loader.load();
 
 // eslint-disable-next-line no-console
 console.log(configObject);
