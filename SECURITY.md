@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-At Typed Environment Loader, we take security vulnerabilities seriously. If you discover a security issue, please report it to us by emailing [ahmedheltaher@gmail.com](mailto:ahmedheltaher@gmail.com). We will work with you to address the problem promptly.
+At Typed Environment Loader, we take security vulnerabilities seriously. If you have a security issue, please email us at [ahmedheltaher@gmail.com](mailto:ahmedheltaher@gmail.com). We will work with you to address the problem as soon as possible.
 
 ## Responsible Disclosure
 
