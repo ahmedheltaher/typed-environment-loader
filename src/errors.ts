@@ -1,0 +1,43 @@
+export class EnvironmentError extends Error {
+	constructor(
+		message: string,
+		public readonly path: string[],
+		public readonly options?: { cause?: Error }
+	) {
+		super(message, options);
+		this.name = this.constructor.name;
+		Error.captureStackTrace(this, this.constructor);
+	}
+}
+
+export class EnvironmentMissingError extends EnvironmentError {
+	constructor(
+		envKey: string,
+		path: string[],
+		public readonly cause?: Error
+	) {
+		super(`Missing required environment variable: ${envKey}`, path, { cause });
+	}
+}
+
+export class EnvironmentValidationError extends EnvironmentError {
+	constructor(
+		envKey: string,
+		message: string,
+		path: string[],
+		public readonly cause?: Error
+	) {
+		super(`Invalid value for ${envKey}: ${message}`, path, { cause });
+	}
+}
+
+export class EnvironmentParseError extends EnvironmentError {
+	constructor(
+		envKey: string,
+		message: string,
+		path: string[],
+		public readonly cause?: Error
+	) {
+		super(`Parse error for ${envKey}: ${message}`, path, { cause });
+	}
+}

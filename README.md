@@ -17,10 +17,11 @@ npm install typed-environment-loader
 ## Usage
 
 ```typescript
-import * as dotenv from 'dotenv';
-import { Configuration, EnvironmentLoader, ParsedConfig } from 'typed-environment-loader';
 
-const config: Configuration = {
+import * as dotenv from 'dotenv';
+import {  EnvironmentLoader, NestedSchema } from 'typed-environment-loader';
+
+const schema = {
  port: { type: 'number', default: 3000, required: true, name: 'PORT' },
  nodeEnv: {
   type: 'enum',
@@ -42,35 +43,40 @@ const config: Configuration = {
   type: 'array',
   items: { type: 'array', items: { type: 'number' } },
   required: false,
-  name: 'MATRIX'
+  name: 'MATRIX',
+  default: [[1, 2], [3, 4]]
+ },
+ redis: {
+  host: { type: 'string', default: 'localhost', required: true, name: 'REDIS_HOST' },
+  port: { type: 'number', default: 6379, required: true, name: 'REDIS_PORT' },
+  password: { type: 'string', required: false, name: 'REDIS_PASSWORD' }
+ },
+ api: {
+  baseUrl: { type: 'string', default: 'http://localhost:3000', required: true, name: 'API_BASE_URL' },
+  timeout: { type: 'number', default: 5000, required: true, name: 'API_TIMEOUT' }
+ },
+ services: {
+  auth: {
+   url: { type: 'string', default: 'http://localhost:4000', required: true, name: 'AUTH_URL' },
+   timeout: { type: 'number', default: 3000, required: true, name: 'AUTH_TIMEOUT' }
+  },
+  payment: {
+   url: { type: 'string', default: 'http://localhost:5000', required: true, name: 'PAYMENT_URL' },
+   timeout: { type: 'number', default: 4000, required: true, name: 'PAYMENT_TIMEOUT' }
+  }
  }
-};
+} satisfies NestedSchema;
 
-interface Config extends ParsedConfig {
- port: number;
- nodeEnv: 'production' | 'development' | 'test';
- postgres: {
-  host: string;
-  password: string;
-  port: number;
- };
- cors: {
-  enabled: boolean;
-  origins: Array<string>;
- };
- matrix: Array<Array<number>>;
-}
 const loadedEnv = dotenv.config({});
 if (loadedEnv.error) {
     throw new Error(
     `Error loading environment variables from.env file it must be located in the root of the project.`
     );
 }
-const loader = new EnvironmentLoader<Config>(config);
-const configObject = loader.loadFromFile().load();
 
+const loader = new EnvironmentLoader(schema);
+const configObject = loader.load();
 console.log(configObject);
-
 ```
 
 ## Why typed-environment-loader?

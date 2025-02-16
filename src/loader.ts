@@ -1,64 +1,82 @@
-import { Parsers, parsers } from './parsers';
-import { Configuration, ConfigurationItem, ParsedConfig } from './types';
+import { EnvironmentMissingError } from './errors';
+import { InferSchemaType } from './infer';
+import { ParserRegistry } from './parsers/parser-registry';
+import { NestedSchema, SchemaItem } from './types';
 
-export class EnvironmentLoader<ResultType extends ParsedConfig> {
-	private config: Configuration;
-	private parsers: Parsers = parsers;
+type Environment = Record<string, string | undefined>;
+type ParseStackItem = {
+	schema: NestedSchema;
+	result: Record<string, unknown>;
+	path: string[];
+};
 
-	constructor(config: Configuration) {
-		this.config = config;
-	}
+export class EnvironmentLoader<T extends NestedSchema> {
+	private readonly parser = new ParserRegistry();
+	private readonly separator = '__';
 
-	private isConfigItem(value: Configuration | ConfigurationItem<any>): value is ConfigurationItem<any> {
-		return typeof value === 'object' && value.type !== undefined && value.name !== undefined;
-	}
+	constructor(
+		private readonly schema: T,
+		private readonly env: Environment = process.env
+	) { }
 
-	public load(): ResultType {
-		const parsedConfig = {} as ResultType;
-		const stack: {
-			parent: ResultType[keyof ResultType] | ParsedConfig[keyof ParsedConfig];
-			current: Configuration | ConfigurationItem<any>;
-		}[] = [{ parent: parsedConfig, current: this.config }];
+	public load(): InferSchemaType<T> {
+		const result = {} as InferSchemaType<T>;
+
+		const stack: Array<ParseStackItem> = [{ schema: this.schema, result, path: [] }];
 
 		while (stack.length > 0) {
-			const { parent, current } = stack.pop()!;
-			for (const [key, value] of Object.entries(current)) {
-				if (this.isConfigItem(value)) {
-					parent[key] = this.loadConfigItem(value);
+			const current = stack.pop()!;
+			const entries = Object.entries(current.schema).reverse();
+
+			for (const [key, config] of entries) {
+				const currentPath = [...current.path, key];
+				const envKey = this.getEnvKey(config, currentPath);
+
+				if (this.isSchemaItem(config)) {
+					current.result[key] = this.parseValue(config, currentPath, envKey);
 				} else {
-					parent[key] = {};
-					stack.push({ parent: parent[key], current: value as Configuration });
+					const nestedResult = {};
+					current.result[key] = nestedResult;
+					stack.push({
+						schema: config,
+						result: nestedResult,
+						path: currentPath
+					});
 				}
 			}
 		}
 
-		return parsedConfig;
+		return result;
 	}
 
-	private loadConfigItem(item: ConfigurationItem<any>): any {
-		const { type, default: defaultValue, required, name } = item;
-		const value = process.env[name];
+	private parseValue(schema: SchemaItem, path: string[], envKey: string): unknown {
+		const value = this.env[envKey.toUpperCase()]?.trim();
 
-		if (value === undefined) {
-			if (required) {
-				throw new Error(`Missing required environment variable ${name}`);
+		if (!value) {
+			if (schema.required) {
+				throw new EnvironmentMissingError(envKey, path);
 			}
-			return defaultValue;
+			return this.handleDefault(schema.default);
 		}
 
-		switch (type) {
-			case 'string':
-				return this.parsers.string(value, name);
-			case 'number':
-				return this.parsers.number(value, name);
-			case 'boolean':
-				return this.parsers.boolean(value, name);
-			case 'enum':
-				return this.parsers.enum(value, item.values, name);
-			case 'array':
-				return this.parsers.array(value, item.items, name);
-			default:
-				throw new Error(`Unsupported type ${type}`);
-		}
+		return this.parser.parse({
+			envKey,
+			path,
+			schema,
+			value
+		}).value;
+	}
+
+	private getEnvKey(config: SchemaItem | NestedSchema, path: string[]): string {
+		if ('name' in config && config.name) return config.name as string;
+		return path.join(this.separator).toUpperCase();
+	}
+
+	private handleDefault(defaultValue?: unknown): unknown {
+		return Array.isArray(defaultValue) ? [...defaultValue] : defaultValue;
+	}
+
+	private isSchemaItem(value: SchemaItem | NestedSchema): value is SchemaItem {
+		return 'type' in value;
 	}
 }
