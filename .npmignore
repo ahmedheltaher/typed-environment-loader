@@ -1,0 +1,41 @@
+# Source files
+src/
+
+# Development configs
+.github/
+.git/
+.gitignore
+.prettierrc
+eslint.config.mjs
+nodemon.json
+tsconfig.json
+
+# Documentation
+CONTRIBUTING.md
+CODE_OF_CONDUCT.md
+SECURITY.md
+
+# Examples and tests
+example/
+__tests__/
+*.test.ts
+*.spec.ts
+
+# Development dependencies
+node_modules/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Build process
+coverage/
+.nyc_output/
+.env
+*.log
+
+# Keep dist folder for publishing
+!dist/
