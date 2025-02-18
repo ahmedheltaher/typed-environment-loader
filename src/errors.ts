@@ -17,6 +17,7 @@ export class EnvironmentMissingError extends EnvironmentError {
 		public readonly cause?: Error
 	) {
 		super(`Missing required environment variable: ${envKey}`, path, { cause });
+		Object.setPrototypeOf(this, EnvironmentMissingError.prototype);
 	}
 }
 
@@ -28,6 +29,7 @@ export class EnvironmentValidationError extends EnvironmentError {
 		public readonly cause?: Error
 	) {
 		super(`Invalid value for ${envKey}: ${message}`, path, { cause });
+		Object.setPrototypeOf(this, EnvironmentValidationError.prototype);
 	}
 }
 
@@ -39,5 +41,6 @@ export class EnvironmentParseError extends EnvironmentError {
 		public readonly cause?: Error
 	) {
 		super(`Parse error for ${envKey}: ${message}`, path, { cause });
+		Object.setPrototypeOf(this, EnvironmentParseError.prototype);
 	}
 }

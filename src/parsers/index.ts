@@ -5,3 +5,4 @@ export * from './enum-parser';
 export * from './number-parser';
 export * from './parser-registry';
 export * from './string-parser';
+export * from './types';

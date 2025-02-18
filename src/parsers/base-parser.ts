@@ -1,17 +1,16 @@
 import { EnvironmentMissingError } from '../errors';
-import { SchemaItem } from '../types';
 import { Parser, ParserContext, ParserResult } from './types';
 
-export abstract class BaseParser<T extends SchemaItem> implements Parser {
+export abstract class BaseParser implements Parser {
 	protected validateRequired(context: ParserContext): void {
 		if (context.schema.required && !context.value) {
 			throw new EnvironmentMissingError(context.envKey, context.path);
 		}
 	}
 
-	protected getDefaultValue(schema: SchemaItem): T['default'] {
-		return Array.isArray(schema.default) ? [...schema.default] : schema.default;
+	protected removeQuotes(value: string): string {
+		return value.trim().replace(/^['"]|['"]$/g, '');
 	}
 
-	abstract parse(ctx: ParserContext): ParserResult;
+	abstract parse(context: ParserContext): ParserResult;
 }
