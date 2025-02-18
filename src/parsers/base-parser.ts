@@ -10,4 +10,9 @@ export abstract class BaseParser implements Parser {
 	}
 
 	abstract parse(context: ParserContext): ParserResult;
+
+	// TODO: Add a method to validate the value
+	// TODO: Add a method to normalize the value
+	// TODO: Add a method to transform the value
+	// TODO: Add a method to handle default values
 }

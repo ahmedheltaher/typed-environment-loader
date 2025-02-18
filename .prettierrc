@@ -5,5 +5,16 @@
 	"tabWidth": 4,
 	"useTabs": true,
 	"printWidth": 120,
-	"bracketSpacing": true
+	"bracketSpacing": true,
+	"proseWrap": "preserve",
+	"overrides": [
+		{
+			"files": "*.ts",
+			"options": {
+				"parser": "typescript"
+			}
+		}
+	],
+	"arrowParens": "avoid",
+	"experimentalTernaries": true
 }

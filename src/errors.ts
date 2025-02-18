@@ -2,7 +2,7 @@ export class EnvironmentError extends Error {
 	constructor(
 		message: string,
 		public readonly path: string[],
-		public readonly options?: { cause?: Error }
+		options?: ErrorOptions
 	) {
 		super(message, options);
 		this.name = this.constructor.name;
@@ -11,35 +11,21 @@ export class EnvironmentError extends Error {
 }
 
 export class EnvironmentMissingError extends EnvironmentError {
-	constructor(
-		envKey: string,
-		path: string[],
-		public readonly cause?: Error
-	) {
+	constructor(envKey: string, path: string[], cause?: Error) {
 		super(`Missing required environment variable: ${envKey}`, path, { cause });
 		Object.setPrototypeOf(this, EnvironmentMissingError.prototype);
 	}
 }
 
 export class EnvironmentValidationError extends EnvironmentError {
-	constructor(
-		envKey: string,
-		message: string,
-		path: string[],
-		public readonly cause?: Error
-	) {
+	constructor(envKey: string, message: string, path: string[], cause?: Error) {
 		super(`Invalid value for ${envKey}: ${message}`, path, { cause });
 		Object.setPrototypeOf(this, EnvironmentValidationError.prototype);
 	}
 }
 
 export class EnvironmentParseError extends EnvironmentError {
-	constructor(
-		envKey: string,
-		message: string,
-		path: string[],
-		public readonly cause?: Error
-	) {
+	constructor(envKey: string, message: string, path: string[], cause?: Error) {
 		super(`Parse error for ${envKey}: ${message}`, path, { cause });
 		Object.setPrototypeOf(this, EnvironmentParseError.prototype);
 	}

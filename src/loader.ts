@@ -1,6 +1,6 @@
 import { createDebugLogger } from './debug';
 import { EnvironmentMissingError } from './errors';
-import { InferSchemaType } from './infer';
+import { InferSchemaTypeExpanded } from './infer';
 import { ParserRegistry } from './parsers/parser-registry';
 import { EnvironmentSchema, SchemaItem } from './types';
 
@@ -11,21 +11,28 @@ type ParseStackItem = {
 	path: string[];
 };
 
-export class EnvironmentLoader<T extends EnvironmentSchema> {
+type EnvironmentLoaderConfig = {
+	separator?: string;
+};
+
+export class EnvironmentLoader<Type extends EnvironmentSchema> {
 	private readonly _debug = createDebugLogger(this.constructor.name);
-	private readonly parser = new ParserRegistry();
-	private readonly separator = '__';
+	private readonly _parser = new ParserRegistry();
+	private _separator = '__';
 
 	constructor(
-		private readonly schema: T,
-		private readonly env: Environment = process.env
-	) {}
+		private readonly _schema: Type,
+		private readonly _env: Environment = process.env,
+		readonly _options: EnvironmentLoaderConfig = {}
+	) {
+		if (_options.separator) this._separator = _options.separator as string;
+	}
 
-	public load(): InferSchemaType<T> {
+	public load(): InferSchemaTypeExpanded<Type> {
 		this._debug.info('Starting to load environment variables');
-		const result = {} as InferSchemaType<T>;
+		const result = {};
 
-		const stack: Array<ParseStackItem> = [{ schema: this.schema, result, path: [] }];
+		const stack: Array<ParseStackItem> = [{ schema: this._schema, result, path: [] }];
 
 		while (stack.length > 0) {
 			const current = stack.pop()!;
@@ -52,12 +59,12 @@ export class EnvironmentLoader<T extends EnvironmentSchema> {
 		}
 
 		this._debug.info('Finished loading environment variables');
-		return result;
+		return result as InferSchemaTypeExpanded<Type>;
 	}
 
 	private parseValue(schema: SchemaItem, path: string[], envKey: string): SchemaItem['default'] | unknown {
 		this._debug.info('Parsing value for envKey', envKey, 'at path', path);
-		const value = this.env[envKey.toUpperCase()]?.trim();
+		const value = this._env[envKey.toUpperCase()]?.trim();
 
 		if (!value) {
 			this._debug.warn('Value for envKey', envKey, 'is missing');
@@ -70,12 +77,12 @@ export class EnvironmentLoader<T extends EnvironmentSchema> {
 		}
 
 		this._debug.info('Parsing value', value, 'for envKey', envKey);
-		return this.parser.parse({ envKey, path, schema, value }).value;
+		return this._parser.parse({ envKey, path, schema, value }).value;
 	}
 
 	private getEnvKey(config: SchemaItem | EnvironmentSchema, path: string[]): string {
 		if ('name' in config && config.name) return config.name as string;
-		return path.join(this.separator).toUpperCase();
+		return path.join(this._separator).toUpperCase();
 	}
 
 	private handleDefault(defaultValue: SchemaItem['default']): SchemaItem['default'] {

@@ -25,7 +25,7 @@ const schema = {
  port: { type: 'number', default: 3000, required: true, name: 'PORT' },
  nodeEnv: {
   type: 'enum',
-  values: ['production', 'development', 'test'],
+  values: ['production', 'development', 'test'] as const,
   default: 'development',
   required: true,
   name: 'NODE_ENV'

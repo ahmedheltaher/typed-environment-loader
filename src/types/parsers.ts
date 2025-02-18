@@ -8,7 +8,7 @@ export interface ParserContext {
 }
 
 export interface ParserResult {
-	value: unknown;
+	value: unknown; // TODO: Use a generic type
 }
 
 export type ParserTypeMap = {
@@ -20,9 +20,8 @@ export type ParserTypeMap = {
 };
 
 export interface Parser {
-	parse(ctx: ParserContext): ParserResult;
+	parse(context: ParserContext): ParserResult;
 }
 
-export type SchemaType<T extends SchemaItem> = T extends { type: infer K extends keyof ParserTypeMap }
-	? ParserTypeMap[K]
-	: never;
+export type SchemaType<Type extends SchemaItem> =
+	Type extends { type: infer Key extends keyof ParserTypeMap } ? ParserTypeMap[Key] : never;

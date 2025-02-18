@@ -1,10 +1,11 @@
+import util from 'util';
 import { EnvironmentLoader, EnvironmentSchema } from '../src';
 
 const schema = {
 	port: { type: 'number', default: 3000, required: true, name: 'PORT' },
 	nodeEnv: {
 		type: 'enum',
-		values: ['production', 'development', 'test'],
+		values: ['production', 'development', 'test'] as const,
 		default: 'development',
 		required: true,
 		name: 'NODE_ENV'
@@ -46,6 +47,28 @@ const schema = {
 			url: { type: 'string', default: 'http://localhost:5000', required: true, name: 'PAYMENT_URL' },
 			timeout: { type: 'number', default: 4000, required: true, name: 'PAYMENT_TIMEOUT' }
 		}
+	},
+	matrix3D: {
+		type: 'array',
+		items: {
+			type: 'array',
+			items: {
+				type: 'array',
+				items: { type: 'number' }
+			}
+		},
+		required: false,
+		name: 'MATRIX3D',
+		default: [
+			[
+				[1, 2],
+				[3, 4]
+			],
+			[
+				[5, 6],
+				[7, 8]
+			]
+		]
 	}
 } satisfies EnvironmentSchema;
 
@@ -59,6 +82,7 @@ process.env = {
 	CORS_ENABLED: 'true',
 	CORS_ORIGINS: '["*"]',
 	MATRIX: `[["1", "2"], ["3", "4"]]`,
+	MATRIX3D: `[[["1", "2"], ["3", "4"]], [["5", "6"], ["7", "8"]]]`,
 	REDIS_HOST: 'localhost',
 	REDIS_PORT: '6379',
 	REDIS_PASSWORD: '<REDIS_PASSWORD>',
@@ -71,7 +95,8 @@ process.env = {
 };
 
 const loader = new EnvironmentLoader(schema);
+
 const configObject = loader.load();
 
 // eslint-disable-next-line no-console
-console.log(configObject);
+console.log(util.inspect(configObject, { colors: true, depth: null }));

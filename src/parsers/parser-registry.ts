@@ -10,8 +10,13 @@ export class ParserRegistry {
 
 	constructor() {
 		this._debug.info('Initializing ParserRegistry');
-		this.registerDefaultParsers();
+		this._registerDefaultParsers();
 		this._debug.info('ParserRegistry initialized with default parsers');
+	}
+
+	public get parsers(): Map<string, TParserConstructor> {
+		this._debug.info('Retrieving all registered parsers');
+		return this._parsers;
 	}
 
 	register(type: string, parserClass: TParserConstructor): this {
@@ -39,7 +44,7 @@ export class ParserRegistry {
 		return result;
 	}
 
-	private registerDefaultParsers(): void {
+	private _registerDefaultParsers(): void {
 		this._debug.info('Registering default parsers');
 		this.register('string', StringParser)
 			.register('number', NumberParser)
@@ -47,10 +52,5 @@ export class ParserRegistry {
 			.register('enum', EnumParser)
 			.register('array', ArrayParser);
 		this._debug.info('Default parsers registered');
-	}
-
-	public get parsers(): Map<string, TParserConstructor> {
-		this._debug.info('Retrieving all registered parsers');
-		return this._parsers;
 	}
 }

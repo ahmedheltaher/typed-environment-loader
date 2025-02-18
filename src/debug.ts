@@ -2,16 +2,12 @@ import { debug } from 'debug';
 
 const DEBUG_NAME = 'ENVIRONMENT_LOADER';
 
-function createDebug(name: string) {
-	return debug(`${DEBUG_NAME}:${name}`);
-}
-
 export function createDebugLogger(name: string) {
-	const logger = createDebug(name);
+	const baseLogger = debug(`${DEBUG_NAME}:${name}`);
 	return {
-		info: logger.extend('info'),
-		warn: logger.extend('warn'),
-		error: logger.extend('error'),
-		trace: logger.extend('trace')
+		info: baseLogger.extend('info'),
+		warn: baseLogger.extend('warn'),
+		error: baseLogger.extend('error'),
+		trace: baseLogger.extend('trace')
 	};
 }
