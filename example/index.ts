@@ -1,4 +1,4 @@
-import { EnvironmentLoader, NestedSchema } from '../src';
+import { EnvironmentLoader, EnvironmentSchema } from '../src';
 
 const schema = {
 	port: { type: 'number', default: 3000, required: true, name: 'PORT' },
@@ -47,7 +47,7 @@ const schema = {
 			timeout: { type: 'number', default: 4000, required: true, name: 'PAYMENT_TIMEOUT' }
 		}
 	}
-} satisfies NestedSchema;
+} satisfies EnvironmentSchema;
 
 process.env = {
 	...process.env,

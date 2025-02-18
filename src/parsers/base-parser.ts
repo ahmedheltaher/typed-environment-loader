@@ -1,14 +1,11 @@
-import { EnvironmentMissingError } from '../errors';
-import { Parser, ParserContext, ParserResult } from './types';
+import { createDebugLogger } from '../debug';
+import { Parser, ParserContext, ParserResult } from '../types';
 
 export abstract class BaseParser implements Parser {
-	protected validateRequired(context: ParserContext): void {
-		if (context.schema.required && !context.value) {
-			throw new EnvironmentMissingError(context.envKey, context.path);
-		}
-	}
+	protected readonly _debug = createDebugLogger(this.constructor.name);
 
 	protected removeQuotes(value: string): string {
+		this._debug.trace(`Removing quotes from value: ${value}`);
 		return value.trim().replace(/^['"]|['"]$/g, '');
 	}
 

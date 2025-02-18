@@ -1,7 +1,7 @@
 import { EnvironmentValidationError } from '../../src/errors';
 import { EnumParser } from '../../src/parsers/enum-parser';
-import { ParserContext } from '../../src/parsers/types';
 import { EnumSchema } from '../../src/types';
+import { ParserContext } from '../../src/types/parsers';
 
 describe('EnumParser', () => {
 	let parser: EnumParser;

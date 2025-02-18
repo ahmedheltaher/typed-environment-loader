@@ -1,16 +1,18 @@
+import { createDebugLogger } from './debug';
 import { EnvironmentMissingError } from './errors';
 import { InferSchemaType } from './infer';
 import { ParserRegistry } from './parsers/parser-registry';
-import { NestedSchema, SchemaItem } from './types';
+import { EnvironmentSchema, SchemaItem } from './types';
 
 type Environment = Record<string, string | undefined>;
 type ParseStackItem = {
-	schema: NestedSchema;
+	schema: EnvironmentSchema;
 	result: Record<string, unknown>;
 	path: string[];
 };
 
-export class EnvironmentLoader<T extends NestedSchema> {
+export class EnvironmentLoader<T extends EnvironmentSchema> {
+	private readonly _debug = createDebugLogger(this.constructor.name);
 	private readonly parser = new ParserRegistry();
 	private readonly separator = '__';
 
@@ -20,17 +22,20 @@ export class EnvironmentLoader<T extends NestedSchema> {
 	) {}
 
 	public load(): InferSchemaType<T> {
+		this._debug.info('Starting to load environment variables');
 		const result = {} as InferSchemaType<T>;
 
 		const stack: Array<ParseStackItem> = [{ schema: this.schema, result, path: [] }];
 
 		while (stack.length > 0) {
 			const current = stack.pop()!;
+			this._debug.info('Processing schema', current.schema, 'at path', current.path);
 			const entries = Object.entries(current.schema).reverse();
 
 			for (const [key, config] of entries) {
 				const currentPath = [...current.path, key];
 				const envKey = this.getEnvKey(config, currentPath);
+				this._debug.info('Processing key', key, 'with config', config, 'and envKey', envKey);
 
 				if (this.isSchemaItem(config)) {
 					current.result[key] = this.parseValue(config, currentPath, envKey);
@@ -46,23 +51,29 @@ export class EnvironmentLoader<T extends NestedSchema> {
 			}
 		}
 
+		this._debug.info('Finished loading environment variables');
 		return result;
 	}
 
 	private parseValue(schema: SchemaItem, path: string[], envKey: string): SchemaItem['default'] | unknown {
+		this._debug.info('Parsing value for envKey', envKey, 'at path', path);
 		const value = this.env[envKey.toUpperCase()]?.trim();
 
 		if (!value) {
+			this._debug.warn('Value for envKey', envKey, 'is missing');
 			if (schema.required) {
+				this._debug.warn('envKey', envKey, 'is required but missing, throwing error');
 				throw new EnvironmentMissingError(envKey, path);
 			}
+			this._debug.info('Using default value for envKey', envKey);
 			return this.handleDefault(schema.default);
 		}
 
+		this._debug.info('Parsing value', value, 'for envKey', envKey);
 		return this.parser.parse({ envKey, path, schema, value }).value;
 	}
 
-	private getEnvKey(config: SchemaItem | NestedSchema, path: string[]): string {
+	private getEnvKey(config: SchemaItem | EnvironmentSchema, path: string[]): string {
 		if ('name' in config && config.name) return config.name as string;
 		return path.join(this.separator).toUpperCase();
 	}
@@ -71,7 +82,7 @@ export class EnvironmentLoader<T extends NestedSchema> {
 		return Array.isArray(defaultValue) ? [...defaultValue] : defaultValue;
 	}
 
-	private isSchemaItem(value: SchemaItem | NestedSchema): value is SchemaItem {
+	private isSchemaItem(value: SchemaItem | EnvironmentSchema): value is SchemaItem {
 		return 'type' in value;
 	}
 }

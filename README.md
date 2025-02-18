@@ -19,7 +19,7 @@ npm install typed-environment-loader
 ```typescript
 
 import * as dotenv from 'dotenv';
-import {  EnvironmentLoader, NestedSchema } from 'typed-environment-loader';
+import {  EnvironmentLoader, EnvironmentSchema } from 'typed-environment-loader';
 
 const schema = {
  port: { type: 'number', default: 3000, required: true, name: 'PORT' },
@@ -65,7 +65,7 @@ const schema = {
    timeout: { type: 'number', default: 4000, required: true, name: 'PAYMENT_TIMEOUT' }
   }
  }
-} satisfies NestedSchema;
+} satisfies EnvironmentSchema;
 
 const loadedEnv = dotenv.config({});
 if (loadedEnv.error) {

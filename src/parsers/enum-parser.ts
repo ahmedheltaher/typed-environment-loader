@@ -1,14 +1,14 @@
 import { EnvironmentValidationError } from '../errors';
-import { EnumSchema } from '../types';
+import { EnumSchema, ParserContext, ParserResult } from '../types';
 import { BaseParser } from './base-parser';
-import { ParserContext, ParserResult } from './types';
 
 export class EnumParser extends BaseParser {
 	parse(context: ParserContext): ParserResult {
-		this.validateRequired(context);
-
 		const enumSchema = context.schema as EnumSchema<readonly string[]>;
+		this._debug.trace(`Parsing value: (${context.value}) as enum`);
+
 		if (!enumSchema.values.includes(context.value)) {
+			this._debug.error(`Invalid value: (${context.value}) not in allowed values: [${enumSchema.values}]`);
 			throw new EnvironmentValidationError(
 				context.envKey,
 				`Allowed values: ${enumSchema.values.join(', ')}`,
@@ -16,6 +16,7 @@ export class EnumParser extends BaseParser {
 			);
 		}
 
+		this._debug.info(`Parsed value: ${context.value}`);
 		return { value: context.value };
 	}
 }

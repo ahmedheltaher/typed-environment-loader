@@ -4,7 +4,8 @@ import { PrimitiveSchema } from './primitive';
 
 export * from './array';
 export * from './enum';
-export * from './nested';
+export * from './environment';
+export * from './parsers';
 export * from './primitive';
 
 export type SchemaItem = PrimitiveSchema | EnumSchema<readonly string[]> | ArraySchema;
