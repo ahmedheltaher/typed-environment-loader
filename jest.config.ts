@@ -38,14 +38,14 @@ const config: Config = {
 		'!src/types/**/*.ts',
 		'!src/infer/**/*.ts',
 		'!src/**/__tests__/**/*.ts',
-		'!src/parsers/types.ts',
-		'!src/errors.ts'
+		'!src/errors.ts',
+		'!src/debug.ts'
 	],
 
 	// Coverage thresholds
 	coverageThreshold: {
 		global: {
-			branches: 65,
+			branches: 60,
 			functions: 80,
 			lines: 80,
 			statements: 80

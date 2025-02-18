@@ -1,19 +1,21 @@
-export type PrimitiveSchema =
-	| {
-			type: 'string';
-			name?: string;
-			default?: string;
-			required?: boolean;
-	  }
-	| {
-			type: 'number';
-			name?: string;
-			default?: number;
-			required?: boolean;
-	  }
-	| {
-			type: 'boolean';
-			name?: string;
-			default?: boolean;
-			required?: boolean;
-	  };
+interface BaseSchema {
+	name?: string;
+	required?: boolean;
+}
+
+interface StringSchema extends BaseSchema {
+	type: 'string';
+	default?: string;
+}
+
+interface NumberSchema extends BaseSchema {
+	type: 'number';
+	default?: number;
+}
+
+interface BooleanSchema extends BaseSchema {
+	type: 'boolean';
+	default?: boolean;
+}
+
+export type PrimitiveSchema = StringSchema | NumberSchema | BooleanSchema;

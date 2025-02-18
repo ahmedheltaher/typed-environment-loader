@@ -1,4 +1,4 @@
-import { ArraySchema, EnumSchema, NestedSchema, PrimitiveSchema, SchemaItem } from '../types';
+import { ArraySchema, EnumSchema, EnvironmentSchema, PrimitiveSchema, SchemaItem } from '../types';
 
 type InferPrimitive<Type> = Type extends { type: 'string' }
 	? string
@@ -35,7 +35,7 @@ export type InferSchemaType<Type> = {
 				: Type[Key] extends ArraySchema
 					? InferArray<Type[Key]>
 					: never
-		: Type[Key] extends NestedSchema
+		: Type[Key] extends EnvironmentSchema
 			? InferSchemaType<Type[Key]>
 			: never;
 };

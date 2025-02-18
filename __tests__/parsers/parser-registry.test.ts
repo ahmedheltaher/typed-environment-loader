@@ -1,6 +1,6 @@
 import { EnvironmentParseError } from '../../src/errors';
 import { ParserRegistry } from '../../src/parsers/parser-registry';
-import { ParserContext, ParserResult } from '../../src/parsers/types';
+import { ParserContext, ParserResult } from '../../src/types/parsers';
 
 describe('ParserRegistry', () => {
 	let registry: ParserRegistry;

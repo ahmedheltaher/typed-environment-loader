@@ -1,4 +1,4 @@
-import { EnvironmentLoader, EnvironmentMissingError, NestedSchema, ParserRegistry } from '../src';
+import { EnvironmentLoader, EnvironmentMissingError, EnvironmentSchema, ParserRegistry } from '../src';
 
 jest.mock('../src/parsers/parser-registry');
 
@@ -26,7 +26,7 @@ describe('EnvironmentLoader', () => {
 			const schema = {
 				testString: { type: 'string', required: true, name: 'TEST_STRING' },
 				testNumber: { type: 'number', required: true, name: 'TEST_NUMBER' },
-			} satisfies NestedSchema;
+			} satisfies EnvironmentSchema;
 
 			// Since entries are processed in reverse order, we need to mock in reverse
 			mockParserRegistry.parse
@@ -62,7 +62,7 @@ describe('EnvironmentLoader', () => {
 				api: {
 					url: { type: 'string', required: true, name: 'API_URL' },
 				},
-			} satisfies NestedSchema;
+			} satisfies EnvironmentSchema;
 
 			// Mock in reverse order of processing
 			mockParserRegistry.parse
@@ -95,7 +95,7 @@ describe('EnvironmentLoader', () => {
 
 			const schema = {
 				test: { type: 'string', required: true, name: 'CUSTOM_ENV_KEY' },
-			} satisfies NestedSchema;
+			} satisfies EnvironmentSchema;
 
 			mockParserRegistry.parse.mockReturnValueOnce({ value: 'value' });
 
@@ -113,7 +113,7 @@ describe('EnvironmentLoader', () => {
 			const schema = {
 				test: { type: 'string', required: false, default: 'default value' },
 				arrayTest: { type: 'array', required: false, default: ['default'], items: { type: 'string' } },
-			} satisfies NestedSchema;
+			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);
 			const result = loader.load();
@@ -129,7 +129,7 @@ describe('EnvironmentLoader', () => {
 
 			const schema = {
 				test: { type: 'string', required: true },
-			} satisfies NestedSchema;
+			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);
 
@@ -143,7 +143,7 @@ describe('EnvironmentLoader', () => {
 
 			const schema = {
 				testString: { type: 'string', required: true },
-			} satisfies NestedSchema;
+			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);
 
@@ -155,7 +155,7 @@ describe('EnvironmentLoader', () => {
 
 			const schema = {
 				array: { type: 'array', required: false, default: [1, 2, 3], items: { type: 'number' } },
-			} satisfies NestedSchema;
+			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);
 			const result = loader.load();

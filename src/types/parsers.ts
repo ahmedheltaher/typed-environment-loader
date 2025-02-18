@@ -1,4 +1,4 @@
-import { ArraySchema, EnumSchema, PrimitiveSchema, SchemaItem } from '../types';
+import { ArraySchema, EnumSchema, PrimitiveSchema, SchemaItem } from '.';
 
 export interface ParserContext {
 	envKey: string;

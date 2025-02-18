@@ -1,6 +1,6 @@
 import { EnvironmentValidationError } from '../../src/errors';
 import { NumberParser } from '../../src/parsers/number-parser';
-import { ParserContext } from '../../src/parsers/types';
+import { ParserContext } from '../../src/types/parsers';
 
 describe('NumberParser', () => {
 	let parser: NumberParser;

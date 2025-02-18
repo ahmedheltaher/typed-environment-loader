@@ -1,7 +1,7 @@
-import { EnvironmentParseError } from '../../src/errors';
+import { EnvironmentParseError, EnvironmentValidationError } from '../../src/errors';
 import { ArrayParser } from '../../src/parsers/array-parser';
 import { ParserRegistry } from '../../src/parsers/parser-registry';
-import { ParserContext } from '../../src/parsers/types';
+import { ParserContext } from '../../src/types/parsers';
 
 describe('ArrayParser', () => {
 	let registry: ParserRegistry;
@@ -53,6 +53,6 @@ describe('ArrayParser', () => {
 			return { value: context.value ? context.value.replace(/"/g, '') : '' };
 		});
 
-		expect(() => parser.parse(context)).toThrow(EnvironmentParseError);
+		expect(() => parser.parse(context)).toThrow(EnvironmentValidationError);
 	});
 });

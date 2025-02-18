@@ -1,8 +1,7 @@
 import { EnvironmentParseError, EnvironmentValidationError } from '../errors';
-import { ArraySchema } from '../types';
+import { ArraySchema, ParserContext, ParserResult } from '../types';
 import { BaseParser } from './base-parser';
 import { ParserRegistry } from './parser-registry';
-import { ParserContext, ParserResult } from './types';
 
 export class ArrayParser extends BaseParser {
 	constructor(private readonly registry: ParserRegistry) {
@@ -10,16 +9,19 @@ export class ArrayParser extends BaseParser {
 	}
 
 	parse(context: ParserContext): ParserResult {
-		this.validateRequired(context);
+		this._debug.info('Parsing array', context);
 
 		let parsed: unknown;
 		try {
 			parsed = JSON.parse(context.value);
+			this._debug.info('Parsed JSON successfully', parsed);
 		} catch (error) {
+			this._debug.error('Error parsing JSON', error);
 			throw new EnvironmentParseError(context.envKey, 'Invalid JSON format', context.path, error as Error);
 		}
 
 		if (!Array.isArray(parsed)) {
+			this._debug.error('Not a valid JSON array', parsed);
 			throw new EnvironmentParseError(context.envKey, 'Not a valid JSON array', context.path);
 		}
 
@@ -32,9 +34,14 @@ export class ArrayParser extends BaseParser {
 				value: JSON.stringify(item)
 			};
 
+			this._debug.info(`Parsing array item at index ${index}`, itemCtx);
+
 			try {
-				return this.registry.parse(itemCtx).value;
+				const parsedItem = this.registry.parse(itemCtx).value;
+				this._debug.info(`Parsed array item at index ${index} successfully`, parsedItem);
+				return parsedItem;
 			} catch (error) {
+				this._debug.error(`Error parsing array item at index ${index}`, error);
 				throw new EnvironmentValidationError(
 					context.envKey,
 					`Item ${index}: ${(error as Error).message}`,
@@ -43,6 +50,7 @@ export class ArrayParser extends BaseParser {
 			}
 		});
 
+		this._debug.info('Parsed array successfully', value);
 		return { value };
 	}
 }
