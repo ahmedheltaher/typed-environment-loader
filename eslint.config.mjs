@@ -40,7 +40,7 @@ export default [
 				}
 			],
 
-			'ts/object-curly-spacing': ['error', 'always', { objectsInObjects: false }]
+			'object-curly-spacing': ['error', 'always', { objectsInObjects: false }]
 		}
 	}
 ];

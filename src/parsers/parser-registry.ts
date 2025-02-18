@@ -2,20 +2,22 @@ import { EnvironmentParseError } from '../errors';
 import { ArrayParser, BooleanParser, EnumParser, NumberParser, StringParser } from './';
 import { Parser, ParserContext, ParserResult } from './types';
 
+type TParserConstructor = new (registry: ParserRegistry) => Parser;
+
 export class ParserRegistry {
-	private readonly parsers = new Map<string, new (registry: ParserRegistry) => Parser>();
+	private readonly _parsers = new Map<string, TParserConstructor>();
 
 	constructor() {
 		this.registerDefaultParsers();
 	}
 
-	register(type: string, parserClass: new (registry: ParserRegistry) => Parser): this {
-		this.parsers.set(type, parserClass);
+	register(type: string, parserClass: TParserConstructor): this {
+		this._parsers.set(type, parserClass);
 		return this;
 	}
 
 	parse(context: ParserContext): ParserResult {
-		const ParserClass = this.parsers.get(context.schema.type);
+		const ParserClass = this._parsers.get(context.schema.type);
 		if (!ParserClass) {
 			throw new EnvironmentParseError(
 				context.envKey,
@@ -33,5 +35,9 @@ export class ParserRegistry {
 			.register('boolean', BooleanParser)
 			.register('enum', EnumParser)
 			.register('array', ArrayParser);
+	}
+
+	public get parsers(): Map<string, TParserConstructor> {
+		return this._parsers;
 	}
 }

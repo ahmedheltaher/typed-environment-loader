@@ -17,7 +17,7 @@ export class EnvironmentLoader<T extends NestedSchema> {
 	constructor(
 		private readonly schema: T,
 		private readonly env: Environment = process.env
-	) { }
+	) {}
 
 	public load(): InferSchemaType<T> {
 		const result = {} as InferSchemaType<T>;
@@ -49,7 +49,7 @@ export class EnvironmentLoader<T extends NestedSchema> {
 		return result;
 	}
 
-	private parseValue(schema: SchemaItem, path: string[], envKey: string): unknown {
+	private parseValue(schema: SchemaItem, path: string[], envKey: string): SchemaItem['default'] | unknown {
 		const value = this.env[envKey.toUpperCase()]?.trim();
 
 		if (!value) {
@@ -59,12 +59,7 @@ export class EnvironmentLoader<T extends NestedSchema> {
 			return this.handleDefault(schema.default);
 		}
 
-		return this.parser.parse({
-			envKey,
-			path,
-			schema,
-			value
-		}).value;
+		return this.parser.parse({ envKey, path, schema, value }).value;
 	}
 
 	private getEnvKey(config: SchemaItem | NestedSchema, path: string[]): string {
@@ -72,7 +67,7 @@ export class EnvironmentLoader<T extends NestedSchema> {
 		return path.join(this.separator).toUpperCase();
 	}
 
-	private handleDefault(defaultValue?: unknown): unknown {
+	private handleDefault(defaultValue: SchemaItem['default']): SchemaItem['default'] {
 		return Array.isArray(defaultValue) ? [...defaultValue] : defaultValue;
 	}
 

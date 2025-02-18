@@ -1,15 +1,10 @@
-import { PrimitiveSchema } from '../types';
 import { BaseParser } from './base-parser';
 import { ParserContext, ParserResult } from './types';
 
-export class StringParser extends BaseParser<PrimitiveSchema> {
+export class StringParser extends BaseParser {
 	parse(context: ParserContext): ParserResult {
 		this.validateRequired(context);
-
-		if (!context.value) {
-			return { value: this.getDefaultValue(context.schema) };
-		}
-		const value = context.value.replace(/^['"]|['"]$/g, '');
+		const value = this.removeQuotes(context.value);
 		return { value };
 	}
 }

@@ -4,7 +4,7 @@ export interface ParserContext {
 	envKey: string;
 	path: string[];
 	schema: SchemaItem;
-	value?: string;
+	value: string;
 }
 
 export interface ParserResult {

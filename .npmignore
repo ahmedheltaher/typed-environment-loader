@@ -9,6 +9,9 @@ src/
 eslint.config.mjs
 nodemon.json
 tsconfig.json
+tsconfig.jest.json
+jest.config.js
+coverage/
 
 # Documentation
 CONTRIBUTING.md
