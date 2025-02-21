@@ -11,16 +11,16 @@ const config: Config = {
 	roots: ['<rootDir>'],
 
 	// Pattern matching for test files
-	testMatch: [
-		'**/__tests__/**/*.ts',
-		'**/?(*.)+(spec|test).ts'
-	],
+	testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
 
 	// Transform TypeScript files with ts-jest
 	transform: {
-		'^.+\\.ts$': ['ts-jest', {
-			tsconfig: 'tsconfig.jest.json'
-		}]
+		'^.+\\.ts$': [
+			'ts-jest',
+			{
+				tsconfig: 'tsconfig.jest.json'
+			}
+		]
 	},
 
 	// Module file extensions to handle
@@ -59,7 +59,7 @@ const config: Config = {
 	verbose: true,
 
 	// Clear mock calls and instances between tests
-	clearMocks: true,
+	clearMocks: true
 
 	// The paths to modules that run some code to configure or set up the testing environment
 	// setupFiles: ['<rootDir>/jest.setup.ts']
