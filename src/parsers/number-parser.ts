@@ -1,5 +1,5 @@
 import { EnvironmentValidationError } from '../errors';
-import { ParserContext, ParserResult } from '../types';
+import { NumberSchema, ParserContext, ParserResult } from '../types';
 import { BaseParser } from './base-parser';
 
 export class NumberParser extends BaseParser {
@@ -19,7 +19,35 @@ export class NumberParser extends BaseParser {
 			throw new EnvironmentValidationError(context.envKey, 'Invalid number', context.path);
 		}
 
+		const numberSchema = context.schema as NumberSchema;
+		this.validate(num, numberSchema, context);
+
 		this._debug.info(`Parsed number for key: ${context.envKey}, value: ${num}`);
 		return { value: num };
+	}
+
+	private validate(value: number, schema: NumberSchema, context: ParserContext): void {
+		if (schema.min !== undefined && value < schema.min) {
+			throw new EnvironmentValidationError(
+				context.envKey,
+				`Value (${value}) is less than minimum (${schema.min})`,
+				context.path
+			);
+		}
+
+		if (schema.max !== undefined && value > schema.max) {
+			throw new EnvironmentValidationError(
+				context.envKey,
+				`Value (${value}) exceeds maximum (${schema.max})`,
+				context.path
+			);
+		}
+
+		if (schema.integer === true && !Number.isInteger(value)) {
+			throw new EnvironmentValidationError(context.envKey, `Value (${value}) must be an integer`, context.path);
+		}
+
+		this.runCustomValidator(schema.validator, value, context);
+		this._debug.trace(`Validated number for key: ${context.envKey}, value: ${value}`);
 	}
 }

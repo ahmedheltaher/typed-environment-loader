@@ -1,5 +1,6 @@
 import { createDebugLogger } from '../debug';
-import { Parser, ParserContext, ParserResult } from '../types';
+import { EnvironmentValidationError } from '../errors';
+import { Parser, ParserContext, ParserResult, Validator } from '../types';
 
 export abstract class BaseParser implements Parser {
 	protected readonly _debug = createDebugLogger(this.constructor.name);
@@ -11,8 +12,17 @@ export abstract class BaseParser implements Parser {
 
 	abstract parse(context: ParserContext): ParserResult;
 
-	// TODO: Add a method to validate the value
-	// TODO: Add a method to normalize the value
-	// TODO: Add a method to transform the value
-	// TODO: Add a method to handle default values
+	protected runCustomValidator<Type>(
+		validator: Validator<Type> | undefined,
+		value: Type,
+		context: ParserContext
+	): void {
+		if (!validator) return;
+		const validatorFunction = typeof validator === 'function' ? validator : validator.function;
+		const message = typeof validator === 'function' ? 'Value failed custom validation' : validator.message;
+
+		if (!validatorFunction(value)) {
+			throw new EnvironmentValidationError(context.envKey, message, context.path);
+		}
+	}
 }

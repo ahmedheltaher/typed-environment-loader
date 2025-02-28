@@ -50,7 +50,29 @@ export class ArrayParser extends BaseParser {
 			}
 		});
 
+		this.validate(value, arraySchema, context);
 		this._debug.info('Parsed array successfully', value);
 		return { value };
+	}
+
+	private validate(value: unknown[], schema: ArraySchema, context: ParserContext): void {
+		if (schema.minItems !== undefined && value.length < schema.minItems) {
+			throw new EnvironmentValidationError(
+				context.envKey,
+				`Array length (${value.length}) is less than minimum length (${schema.minItems})`,
+				context.path
+			);
+		}
+
+		if (schema.maxItems !== undefined && value.length > schema.maxItems) {
+			throw new EnvironmentValidationError(
+				context.envKey,
+				`Array length (${value.length}) exceeds maximum length (${schema.maxItems})`,
+				context.path
+			);
+		}
+
+		this.runCustomValidator(schema.validator, value, context);
+		this._debug.trace(`Validated array for key: ${context.envKey}, value: ${value}`);
 	}
 }

@@ -1,20 +1,13 @@
-type PrimitiveType = 'string' | 'number' | 'boolean';
+import { EnumSchema } from './enum';
+import { BaseSchema, PrimitiveSchema, Validator } from './primitive';
 
-type FlatArray = {
-	type: PrimitiveType;
-};
+export type ArrayItemSchema = PrimitiveSchema | EnumSchema<readonly string[]> | ArraySchema;
 
-type NestedArray = {
+export interface ArraySchema<Type = unknown> extends BaseSchema {
 	type: 'array';
 	items: ArrayItemSchema;
-};
-
-export type ArrayItemSchema = FlatArray | NestedArray;
-
-export type ArraySchema = {
-	type: 'array';
-	name?: string;
-	items: ArrayItemSchema;
-	default?: readonly unknown[] | unknown[]; // TODO: Use a generic type
-	required?: boolean;
-};
+	default?: readonly Type[];
+	minItems?: number;
+	maxItems?: number;
+	validator?: Validator<any>;
+}

@@ -1,6 +1,6 @@
 import { createDebugLogger } from './debug';
 import { EnvironmentMissingError } from './errors';
-import { InferSchemaTypeExpanded } from './infer';
+import { WithOptionals } from './infer';
 import { ParserRegistry } from './parsers/parser-registry';
 import { EnvironmentSchema, SchemaItem } from './types';
 
@@ -11,24 +11,36 @@ type ParseStackItem = {
 	path: string[];
 };
 
-type EnvironmentLoaderConfig = {
+export interface EnvironmentLoaderConfig {
 	separator?: string;
-};
+	prefix?: string;
+	transformEnvKey?: (key: string) => string;
+	transformPath?: (path: string[]) => string;
+	defaultRequired?: boolean;
+	logLevel?: 'none' | 'error' | 'warn' | 'info' | 'debug';
+}
 
-export class EnvironmentLoader<Type extends EnvironmentSchema> {
+export class EnvironmentLoader<T extends EnvironmentSchema> {
 	private readonly _debug = createDebugLogger(this.constructor.name);
 	private readonly _parser = new ParserRegistry();
-	private _separator = '__';
+	private readonly _config: Required<EnvironmentLoaderConfig>;
 
 	constructor(
-		private readonly _schema: Type,
+		private readonly _schema: T,
 		private readonly _env: Environment = process.env,
-		readonly _options: EnvironmentLoaderConfig = {}
+		config: EnvironmentLoaderConfig = {}
 	) {
-		if (_options.separator) this._separator = _options.separator as string;
+		this._config = {
+			separator: config.separator || '__',
+			prefix: config.prefix || '',
+			transformEnvKey: config.transformEnvKey || (key => key.toUpperCase()),
+			transformPath: config.transformPath || (path => path.join(this._config.separator)),
+			defaultRequired: config.defaultRequired ?? false,
+			logLevel: config.logLevel || 'error'
+		};
 	}
 
-	public load(): InferSchemaTypeExpanded<Type> {
+	public load(): WithOptionals<T> {
 		this._debug.info('Starting to load environment variables');
 		const result = {};
 
@@ -59,30 +71,37 @@ export class EnvironmentLoader<Type extends EnvironmentSchema> {
 		}
 
 		this._debug.info('Finished loading environment variables');
-		return result as InferSchemaTypeExpanded<Type>;
+		return result as WithOptionals<T>;
 	}
 
-	private parseValue(schema: SchemaItem, path: string[], envKey: string): SchemaItem['default'] | unknown {
+	private parseValue(schema: SchemaItem, path: string[], envKey: string): unknown {
 		this._debug.info('Parsing value for envKey', envKey, 'at path', path);
-		const value = this._env[envKey.toUpperCase()]?.trim();
+		const envKeyTransformed = this._config.transformEnvKey(envKey);
+		const value = this._env[envKeyTransformed]?.trim();
 
 		if (!value) {
 			this._debug.warn('Value for envKey', envKey, 'is missing');
-			if (schema.required) {
+			const isRequired = schema.required ?? this._config.defaultRequired;
+
+			if (isRequired) {
 				this._debug.warn('envKey', envKey, 'is required but missing, throwing error');
 				throw new EnvironmentMissingError(envKey, path);
 			}
+
 			this._debug.info('Using default value for envKey', envKey);
 			return this.handleDefault(schema.default);
 		}
 
 		this._debug.info('Parsing value', value, 'for envKey', envKey);
-		return this._parser.parse({ envKey, path, schema, value }).value;
+		return this._parser.parse<unknown>({ envKey, path, schema, value }).value;
 	}
 
 	private getEnvKey(config: SchemaItem | EnvironmentSchema, path: string[]): string {
-		if ('name' in config && config.name) return config.name as string;
-		return path.join(this._separator).toUpperCase();
+		if ('name' in config && config.name) {
+			return this._config.prefix + config.name;
+		}
+
+		return this._config.prefix + this._config.transformPath(path);
 	}
 
 	private handleDefault(defaultValue: SchemaItem['default']): SchemaItem['default'] {

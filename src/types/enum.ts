@@ -1,7 +1,7 @@
-export type EnumSchema<Type extends readonly string[]> = {
+import { BaseSchema } from './primitive';
+
+export interface EnumSchema<T extends readonly string[]> extends BaseSchema {
 	type: 'enum';
-	name?: string;
-	values: Type;
-	default?: Type[number];
-	required?: boolean;
-};
+	values: T;
+	default?: T[number];
+}

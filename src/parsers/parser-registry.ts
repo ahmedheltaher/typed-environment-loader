@@ -1,11 +1,26 @@
 import { createDebugLogger } from '../debug';
 import { EnvironmentParseError } from '../errors';
-import { Parser, ParserContext, ParserResult } from '../types';
+import { ParserContext, ParserResult, SchemaItem } from '../types';
 import { ArrayParser, BooleanParser, EnumParser, NumberParser, StringParser } from './';
 
-type TParserConstructor = new (registry: ParserRegistry) => Parser;
+export interface TypedParserContext<Type extends SchemaItem> extends ParserContext {
+	schema: Type;
+}
+
+export interface TypedParserResult<Type> extends ParserResult {
+	value: Type;
+}
+
+export interface TypedParser<Type extends SchemaItem, Registry> {
+	parse(context: TypedParserContext<Type>): TypedParserResult<Registry>;
+}
+
+type ParserConstructor<Type extends SchemaItem = SchemaItem, Registry = unknown> = new (
+	registry: ParserRegistry
+) => TypedParser<Type, Registry>;
+
 export class ParserRegistry {
-	private readonly _parsers = new Map<string, TParserConstructor>();
+	private readonly _parsers = new Map<string, ParserConstructor>();
 	private readonly _debug = createDebugLogger(this.constructor.name);
 
 	constructor() {
@@ -14,21 +29,22 @@ export class ParserRegistry {
 		this._debug.info('ParserRegistry initialized with default parsers');
 	}
 
-	public get parsers(): Map<string, TParserConstructor> {
+	public get parsers(): ReadonlyMap<string, ParserConstructor> {
 		this._debug.info('Retrieving all registered parsers');
 		return this._parsers;
 	}
 
-	register(type: string, parserClass: TParserConstructor): this {
+	register<T extends SchemaItem, R>(type: string, parserClass: ParserConstructor<T, R>): this {
 		this._debug.info(`Attempting to register parser for type: ${type}`);
 		this._parsers.set(type, parserClass);
 		this._debug.info(`Registered parser for type: ${type} (${parserClass.name})`);
 		return this;
 	}
 
-	parse(context: ParserContext): ParserResult {
+	parse<T = unknown>(context: ParserContext): TypedParserResult<T> {
 		this._debug.info(`Parsing ${context.envKey} with type: ${context.schema.type}`);
 		const ParserClass = this._parsers.get(context.schema.type);
+
 		if (!ParserClass) {
 			this._debug.error(`No parser registered for type: ${context.schema.type}`);
 			throw new EnvironmentParseError(
@@ -37,9 +53,11 @@ export class ParserRegistry {
 				context.path
 			);
 		}
+
 		this._debug.info(`Found parser for type: ${context.schema.type} (${ParserClass.name})`);
 		const parser = new ParserClass(this);
-		const result = parser.parse(context);
+		const result = parser.parse(context) as TypedParserResult<T>;
+
 		this._debug.info(`Successfully parsed ${context.envKey} with type: ${context.schema.type}`);
 		return result;
 	}
