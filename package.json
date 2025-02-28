@@ -1,6 +1,6 @@
 {
 	"name": "typed-environment-loader",
-	"version": "0.4.5-0",
+	"version": "0.4.6-0",
 	"description": "typed-environment-loader is a lightweight utility for loading environment variables in a typed manner, ensuring type safety and consistency in your Node.js applications.",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
