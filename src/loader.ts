@@ -17,7 +17,6 @@ export interface EnvironmentLoaderConfig {
 	transformEnvKey?: (key: string) => string;
 	transformPath?: (path: string[]) => string;
 	defaultRequired?: boolean;
-	logLevel?: 'none' | 'error' | 'warn' | 'info' | 'debug';
 }
 
 export class EnvironmentLoader<T extends EnvironmentSchema> {
@@ -35,8 +34,7 @@ export class EnvironmentLoader<T extends EnvironmentSchema> {
 			prefix: config.prefix || '',
 			transformEnvKey: config.transformEnvKey || (key => key.toUpperCase()),
 			transformPath: config.transformPath || (path => path.join(this._config.separator)),
-			defaultRequired: config.defaultRequired ?? false,
-			logLevel: config.logLevel || 'error'
+			defaultRequired: config.defaultRequired ?? false
 		};
 	}
 
