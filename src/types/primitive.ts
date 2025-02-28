@@ -1,19 +1,37 @@
-interface BaseSchema {
+export interface BaseSchema {
 	name?: string;
 	required?: boolean;
+	description?: string; // Adding documentation capability
 }
 
-interface StringSchema extends BaseSchema {
+type ValidatorFunction<Type> = (value: Type) => boolean;
+export type Validator<Type> =
+	| ValidatorFunction<Type>
+	| {
+			function: ValidatorFunction<Type>;
+			message: string;
+			description?: string;
+	  };
+
+export interface StringSchema extends BaseSchema {
 	type: 'string';
 	default?: string;
+	minLength?: number;
+	maxLength?: number;
+	pattern?: RegExp | string;
+	validator?: Validator<string>;
 }
 
-interface NumberSchema extends BaseSchema {
+export interface NumberSchema extends BaseSchema {
 	type: 'number';
 	default?: number;
+	min?: number;
+	max?: number;
+	integer?: boolean;
+	validator?: Validator<number>;
 }
 
-interface BooleanSchema extends BaseSchema {
+export interface BooleanSchema extends BaseSchema {
 	type: 'boolean';
 	default?: boolean;
 }

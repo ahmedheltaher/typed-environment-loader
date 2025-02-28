@@ -21,7 +21,10 @@ const schema = {
 	},
 	matrix: {
 		type: 'array',
-		items: { type: 'array', items: { type: 'number' } },
+		items: {
+			type: 'array',
+			items: { type: 'number' }
+		},
 		required: false,
 		name: 'MATRIX',
 		default: [
