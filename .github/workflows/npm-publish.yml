@@ -34,8 +34,8 @@ jobs:
               id: get_version
               run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-            - name: Update package version
-              run: npm version $VERSION --no-git-tag-version
+            # - name: Update package version
+            #   run: npm version $VERSION --no-git-tag-version
 
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v1
