@@ -12,6 +12,7 @@ const config: Config = {
 
 	// Pattern matching for test files
 	testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
+	testPathIgnorePatterns: ['/node_modules/', '/dist/'],
 
 	// Transform TypeScript files with ts-jest
 	transform: {
