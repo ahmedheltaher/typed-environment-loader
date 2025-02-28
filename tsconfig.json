@@ -30,14 +30,5 @@
 		"noEmit": false,
 		"declaration": true
 	},
-	"include": [
-		"src/**/*",
-		"__tests__/parsers/array-parser.test.ts",
-		"__tests__/parsers/boolean-parser.test.ts",
-		"__tests__/parsers/enum-parser.test.ts",
-		"__tests__/parsers/number-parser.test.ts",
-		"__tests__/parsers/parser-registry.test.ts",
-		"__tests__/parsers/string-parser.test.ts",
-		"__tests__/loader.test.ts"
-	]
+	"include": ["src/**/*"]
 }

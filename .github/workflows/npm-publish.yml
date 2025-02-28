@@ -34,13 +34,26 @@ jobs:
               id: get_version
               run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-            # - name: Update package version
-            #   run: npm version $VERSION --no-git-tag-version
+            - name: Generate Release Notes
+              id: release_notes
+              run: |
+                  # Get commits since last tag
+                  PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+                  if [ -z "$PREVIOUS_TAG" ]; then
+                    COMMITS=$(git log --pretty=format:"- %s" $GITHUB_SHA)
+                  else
+                   COMMITS=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..$GITHUB_SHA)
+                  fi
+                  echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+                  echo "## Changes in this release" >> $GITHUB_ENV
+                  echo "$COMMITS" >> $GITHUB_ENV
+                  echo "EOF" >> $GITHUB_ENV
 
             - name: Create GitHub Release
               uses: softprops/action-gh-release@v1
               with:
                   name: Release ${{ env.VERSION }}
+                  body: ${{ env.RELEASE_NOTES }}
                   draft: false
                   prerelease: false
               env:
