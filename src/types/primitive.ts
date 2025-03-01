@@ -1,17 +1,10 @@
+import { Transform, Validator } from './utils';
+
 export interface BaseSchema {
 	name?: string;
 	required?: boolean;
-	description?: string; // Adding documentation capability
+	description?: string;
 }
-
-type ValidatorFunction<Type> = (value: Type) => boolean;
-export type Validator<Type> =
-	| ValidatorFunction<Type>
-	| {
-			function: ValidatorFunction<Type>;
-			message: string;
-			description?: string;
-	  };
 
 export interface StringSchema extends BaseSchema {
 	type: 'string';
@@ -20,6 +13,7 @@ export interface StringSchema extends BaseSchema {
 	maxLength?: number;
 	pattern?: RegExp | string;
 	validator?: Validator<string>;
+	transform?: Transform<string>;
 }
 
 export interface NumberSchema extends BaseSchema {
@@ -29,6 +23,7 @@ export interface NumberSchema extends BaseSchema {
 	max?: number;
 	integer?: boolean;
 	validator?: Validator<number>;
+	transform?: Transform<number>;
 }
 
 export interface BooleanSchema extends BaseSchema {

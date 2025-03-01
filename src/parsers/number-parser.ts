@@ -22,8 +22,11 @@ export class NumberParser extends BaseParser {
 		const numberSchema = context.schema as NumberSchema;
 		this.validate(num, numberSchema, context);
 
+		const transformedValue = this.transform(num, context);
+		this._debug.info(`Transformed number for key: ${context.envKey}, value: ${transformedValue}`);
+
 		this._debug.info(`Parsed number for key: ${context.envKey}, value: ${num}`);
-		return { value: num };
+		return { value: transformedValue };
 	}
 
 	private validate(value: number, schema: NumberSchema, context: ParserContext): void {

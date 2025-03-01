@@ -7,7 +7,8 @@ export class StringParser extends BaseParser {
 		const value = this.removeQuotes(context.value);
 		const stringSchema = context.schema as StringSchema;
 		this.validate(value, stringSchema, context);
-		return { value };
+		const transformedValue = this.transform(value, context);
+		return { value: transformedValue };
 	}
 
 	private validate(value: string, schema: StringSchema, context: ParserContext): void {

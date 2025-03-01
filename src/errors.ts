@@ -44,6 +44,18 @@ export class EnvironmentValidationError extends EnvironmentError {
 	}
 }
 
+export class EnvironmentTransformError extends EnvironmentError {
+	constructor(
+		public readonly envKey: string,
+		public readonly transformMessage: string,
+		path: string[],
+		cause?: Error
+	) {
+		super(`Transform error for ${envKey}: ${transformMessage}`, path, { cause });
+		Object.setPrototypeOf(this, EnvironmentTransformError.prototype);
+	}
+}
+
 export class EnvironmentParseError extends EnvironmentError {
 	constructor(
 		public readonly envKey: string,

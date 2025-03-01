@@ -51,8 +51,10 @@ export class ArrayParser extends BaseParser {
 		});
 
 		this.validate(value, arraySchema, context);
+		const transformedValue = this.transform(value, context);
+		this._debug.info('Transformed array successfully', transformedValue);
 		this._debug.info('Parsed array successfully', value);
-		return { value };
+		return { value: transformedValue };
 	}
 
 	private validate(value: unknown[], schema: ArraySchema, context: ParserContext): void {
