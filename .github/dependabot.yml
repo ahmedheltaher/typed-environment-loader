@@ -5,7 +5,25 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "weekly"
+    - package-ecosystem: 'npm'
+      directory: '/'
+      schedule:
+          interval: 'weekly'
+      reviewers:
+          - 'ahmedheltaher'
+      labels:
+          - 'dependencies'
+          - 'npm'
+      # Configure Dependabot versioning strategy
+      versioning-strategy: 'auto'
+      # Limit the number of open PRs Dependabot can have at once
+      open-pull-requests-limit: 10
+      # Allow security updates
+      allow:
+          - dependency-type: 'direct'
+          - dependency-type: 'indirect'
+            update-type: 'security'
+      # Configure Dependabot commit message conventions
+      commit-message:
+          prefix: 'chore(deps)'
+          include: 'scope'
