@@ -7,24 +7,30 @@ on:
 
 permissions:
     contents: write
+    packages: write
 
 jobs:
     build-and-publish:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
               with:
                   fetch-depth: 0
 
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
                   node-version: '18.x'
                   registry-url: 'https://registry.npmjs.org'
+                  cache: 'npm'
 
             - name: Install dependencies
               run: npm ci
+
+            - name: Lint code
+              run: npm run lint
+              continue-on-error: true
 
             - name: Build package
               run: npm run build
@@ -41,27 +47,78 @@ jobs:
               run: |
                   # Get commits since last tag
                   PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-                  if [ -z "$PREVIOUS_TAG" ]; then
-                    COMMITS=$(git log --pretty=format:"- %s" $GITHUB_SHA)
-                  else
-                   COMMITS=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..$GITHUB_SHA)
-                  fi
+
+                  # Create header for release notes
                   echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-                  echo "## Changes in this release" >> $GITHUB_ENV
-                  echo "$COMMITS" >> $GITHUB_ENV
+                  echo "# Release v${{ env.VERSION }}" >> $GITHUB_ENV
+                  echo "" >> $GITHUB_ENV
+
+                  if [ -z "$PREVIOUS_TAG" ]; then
+                    echo "## 🚀 Initial Release" >> $GITHUB_ENV
+                    COMMITS=$(git log --pretty=format:"%h %s" --first-parent $GITHUB_SHA)
+                  else
+                    echo "## 🚀 Changes since $PREVIOUS_TAG" >> $GITHUB_ENV
+                    echo "" >> $GITHUB_ENV
+
+                    # Get statistics
+                    COMMIT_COUNT=$(git rev-list --count $PREVIOUS_TAG..$GITHUB_SHA)
+                    CONTRIBUTOR_COUNT=$(git log $PREVIOUS_TAG..$GITHUB_SHA --format='%an' | sort -u | wc -l)
+                    echo "* 📊 Stats: $COMMIT_COUNT commits from $CONTRIBUTOR_COUNT contributors" >> $GITHUB_ENV
+                    echo "" >> $GITHUB_ENV
+
+                    # Categorize commits
+                    echo "### ✨ Features" >> $GITHUB_ENV
+                    git log $PREVIOUS_TAG..$GITHUB_SHA --pretty=format:"* %s" --first-parent | grep -i "feat\|feature\|add" | grep -v "fix\|bug\|docs\|chore\|refactor" >> $GITHUB_ENV || echo "* None" >> $GITHUB_ENV
+                    echo "" >> $GITHUB_ENV
+
+                    echo "### 🐛 Bug Fixes" >> $GITHUB_ENV
+                    git log $PREVIOUS_TAG..$GITHUB_SHA --pretty=format:"* %s" --first-parent | grep -i "fix\|bug" >> $GITHUB_ENV || echo "* None" >> $GITHUB_ENV
+                    echo "" >> $GITHUB_ENV
+
+                    echo "### 📚 Documentation" >> $GITHUB_ENV
+                    git log $PREVIOUS_TAG..$GITHUB_SHA --pretty=format:"* %s" --first-parent | grep -i "docs\|documentation" >> $GITHUB_ENV || echo "* None" >> $GITHUB_ENV
+                    echo "" >> $GITHUB_ENV
+
+                    echo "### ♻️ Refactoring" >> $GITHUB_ENV
+                    git log $PREVIOUS_TAG..$GITHUB_SHA --pretty=format:"* %s" --first-parent | grep -i "refactor" >> $GITHUB_ENV || echo "* None" >> $GITHUB_ENV
+                    echo "" >> $GITHUB_ENV
+
+                    echo "### 🧹 Chores" >> $GITHUB_ENV
+                    git log $PREVIOUS_TAG..$GITHUB_SHA --pretty=format:"* %s" --first-parent | grep -i "chore" >> $GITHUB_ENV || echo "* None" >> $GITHUB_ENV
+                    echo "" >> $GITHUB_ENV
+
+                    echo "### 🔄 Other Changes" >> $GITHUB_ENV
+                    git log $PREVIOUS_TAG..$GITHUB_SHA --pretty=format:"* %s" --first-parent | grep -v -i "feat\|feature\|add\|fix\|bug\|docs\|documentation\|refactor\|chore" >> $GITHUB_ENV || echo "* None" >> $GITHUB_ENV
+                  fi
+
                   echo "EOF" >> $GITHUB_ENV
 
             - name: Create GitHub Release
-              uses: softprops/action-gh-release@v1
+              uses: softprops/action-gh-release@v2
               with:
-                  name: Release ${{ env.VERSION }}
+                  name: Release v${{ env.VERSION }}
                   body: ${{ env.RELEASE_NOTES }}
                   draft: false
                   prerelease: false
+                  generate_release_notes: false
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Check npm package contents
+              run: npm pack --dry-run
 
             - name: Publish to npm
               run: npm publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+            - name: Notify on success
+              if: success()
+              run: |
+                  echo "Package v${{ env.VERSION }} successfully published to npm!"
+                  # Add notification step here (e.g., Slack, Discord, etc.) if needed
+
+            - name: Notify on failure
+              if: failure()
+              run: echo "Failed to publish package to npm"
+              # Add notification step here if needed
