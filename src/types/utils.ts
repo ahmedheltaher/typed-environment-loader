@@ -1,4 +1,4 @@
-type ValidatorFunction<Type> = (value: Type) => boolean;
+export type ValidatorFunction<Type> = (value: Type) => boolean;
 export type Validator<Type> =
 	| ValidatorFunction<Type>
 	| {

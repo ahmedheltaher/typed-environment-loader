@@ -1,5 +1,5 @@
 import util from 'util';
-import { EnvironmentLoader, EnvironmentSchema } from '../src';
+import { EnvironmentLoader, EnvironmentSchema, validators } from '../src';
 
 const schema = {
 	port: { type: 'number', default: 3000, required: true, name: 'PORT' },
@@ -11,7 +11,13 @@ const schema = {
 		name: 'NODE_ENV'
 	},
 	postgres: {
-		host: { type: 'string', default: 'localhost', required: true, name: 'POSTGRES_HOST' },
+		host: {
+			type: 'string',
+			default: 'localhost',
+			required: true,
+			name: 'POSTGRES_HOST',
+			validator: validators.ipv4()
+		},
 		password: { type: 'string', required: true, name: 'POSTGRES_PASSWORD' },
 		port: { type: 'number', default: 5432, required: true, name: 'POSTGRES_PORT' }
 	},
@@ -79,7 +85,7 @@ process.env = {
 	...process.env,
 	PORT: '3000',
 	NODE_ENV: 'development',
-	POSTGRES_HOST: 'localhost',
+	POSTGRES_HOST: '10.0.0.1',
 	POSTGRES_PASSWORD: '<PASSWORD>',
 	POSTGRES_PORT: '5432',
 	CORS_ENABLED: 'true',
