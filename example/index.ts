@@ -16,7 +16,7 @@ const schema = {
 			default: 'localhost',
 			required: true,
 			name: 'POSTGRES_HOST',
-			validator: validators.ipv4()
+			validator: validators.network.ipv4()
 		},
 		password: { type: 'string', required: true, name: 'POSTGRES_PASSWORD' },
 		port: { type: 'number', default: 5432, required: true, name: 'POSTGRES_PORT' }
