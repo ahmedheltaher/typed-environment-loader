@@ -18,14 +18,6 @@ updates:
       versioning-strategy: 'auto'
       # Limit the number of open PRs Dependabot can have at once
       open-pull-requests-limit: 10
-      # Allow both direct dependencies and security updates for indirect dependencies
-      allow:
-          - dependency-type: 'direct'
-          - dependency-type: 'indirect'
-      # Only allow security updates for indirect dependencies
-      ignore:
-          - dependency-type: 'indirect'
-            update-types: ['version-update:semver-patch', 'version-update:semver-minor', 'version-update:semver-major']
       # Configure Dependabot commit message conventions
       commit-message:
           prefix: 'chore(deps)'
