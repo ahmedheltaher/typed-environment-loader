@@ -31,7 +31,6 @@ describe('BooleanParser', () => {
 		expect(result.value).toBe(false);
 	});
 
-
 	it('should throw an error for invalid boolean string', () => {
 		const context: ParserContext = {
 			value: 'invalid',
@@ -40,6 +39,8 @@ describe('BooleanParser', () => {
 			path: []
 		};
 		expect(() => parser.parse(context)).toThrow(EnvironmentValidationError);
-		expect(() => parser.parse(context)).toThrow('Must be "true" or "false"');
+		expect(() => parser.parse(context)).toThrow(
+			'Invalid value for : Invalid boolean value. Must be one of: true, 1, yes, y, on, false, 0, no, n, off'
+		);
 	});
 });

@@ -2,47 +2,56 @@ import { createDebugLogger } from '../debug';
 import { EnvironmentTransformError, EnvironmentValidationError } from '../errors';
 import { Parser, ParserContext, ParserResult, TransformFunction, Validator } from '../types';
 
-export abstract class BaseParser implements Parser {
+export abstract class BaseParser<T = unknown> implements Parser {
 	protected readonly _debug = createDebugLogger(this.constructor.name);
 
 	protected removeQuotes(value: string): string {
 		this._debug.trace(`Removing quotes from value: ${value}`);
-		return value.trim().replace(/^['"]|['"]$/g, '');
+		return value.trim().replace(/^['"`]|['"`]$/g, '');
 	}
 
 	abstract parse(context: ParserContext): ParserResult;
-	// abstract validate<Type>(value: Type, context: ParserContext): Promise<void>;
 
-	protected transform<Type>(value: Type, context: ParserContext): Type {
+	protected transform(value: T, context: ParserContext): T {
 		this._debug.trace(`Transforming value: ${value}`);
 		const schema = context.schema;
+
 		if (!('transform' in schema) || !schema.transform) {
 			return value;
 		}
-		const transform = schema.transform;
+
 		const transformFunction =
-			typeof transform === 'function' ?
-				(transform as TransformFunction<Type>)
-			:	(transform.function as TransformFunction<Type>);
+			typeof schema.transform === 'function' ?
+				(schema.transform as TransformFunction<T>)
+			:	(schema.transform.function as TransformFunction<T>);
 
 		try {
-			return transformFunction(value);
+			const transformedValue = transformFunction(value);
+			this._debug.info(`Successfully transformed value: ${transformedValue}`);
+			return transformedValue;
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
+			this._debug.error(`Transform error: ${errorMessage}`);
 			throw new EnvironmentTransformError(context.envKey, errorMessage, context.path);
 		}
 	}
 
-	protected runCustomValidator<Type>(
-		validator: Validator<Type> | undefined,
-		value: Type,
-		context: ParserContext
-	): void {
+	protected runCustomValidator(validator: Validator<T> | undefined, value: T, context: ParserContext): void {
 		if (!validator) return;
+
 		const validatorFunction = typeof validator === 'function' ? validator : validator.function;
+
 		const message = typeof validator === 'function' ? 'Value failed custom validation' : validator.message;
 
-		if (!validatorFunction(value)) {
+		try {
+			const isValid = validatorFunction(value);
+
+			if (!isValid) {
+				this._debug.error(`Custom validation failed: ${message}`);
+				throw new EnvironmentValidationError(context.envKey, message, context.path);
+			}
+		} catch (error) {
+			this._debug.error(`Validation error: ${error}`);
 			throw new EnvironmentValidationError(context.envKey, message, context.path);
 		}
 	}

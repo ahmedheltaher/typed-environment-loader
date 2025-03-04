@@ -20,12 +20,13 @@ describe('EnumParser', () => {
 		};
 	});
 
-
 	it('should throw EnvironmentValidationError if value is not in enum values', () => {
 		context.value = 'invalid_value';
 
 		expect(() => parser.parse(context)).toThrow(EnvironmentValidationError);
-		expect(() => parser.parse(context)).toThrow('Allowed values: value1, value2, value3');
+		expect(() => parser.parse(context)).toThrow(
+			'Invalid value for : Invalid value. Allowed values are: value1, value2, value3'
+		);
 	});
 
 	it('should return context value if it is in enum values', () => {

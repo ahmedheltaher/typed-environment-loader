@@ -1,14 +1,11 @@
 import { ParserContext, StringParser } from '../../src/parsers';
 
-
 describe('StringParser', () => {
 	let parser: StringParser;
 
 	beforeEach(() => {
 		parser = new StringParser();
 	});
-
-
 
 	it('should return trimmed value if context value is provided', () => {
 		const context: ParserContext = {
@@ -24,14 +21,14 @@ describe('StringParser', () => {
 
 	it('should return empty string if context value is empty string', () => {
 		const context: ParserContext = {
-			value: "",
+			value: '',
 			schema: { type: 'string', required: false },
 			envKey: 'TEST_KEY',
 			path: []
 		};
 
 		const result = parser.parse(context);
-		expect(result.value).toBe("");
+		expect(result.value).toBe('');
 	});
 
 	it('should return value without quotes if context value is quoted', () => {
@@ -45,5 +42,4 @@ describe('StringParser', () => {
 		const result = parser.parse(context);
 		expect(result.value).toBe('quotedValue');
 	});
-
 });

@@ -9,7 +9,6 @@ describe('NumberParser', () => {
 		parser = new NumberParser();
 	});
 
-
 	it('should parse a valid integer string', () => {
 		const context: ParserContext = {
 			value: '123',

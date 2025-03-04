@@ -2,12 +2,16 @@ import { EnvironmentValidationError } from '../errors';
 import { ParserContext, ParserResult, StringSchema } from '../types';
 import { BaseParser } from './base-parser';
 
-export class StringParser extends BaseParser {
+export class StringParser extends BaseParser<string> {
 	parse(context: ParserContext): ParserResult {
 		const value = this.removeQuotes(context.value);
 		const stringSchema = context.schema as StringSchema;
+
+		this._debug.info(`Parsing string for key: ${context.envKey}, value: ${value}`);
+
 		this.validate(value, stringSchema, context);
 		const transformedValue = this.transform(value, context);
+
 		return { value: transformedValue };
 	}
 
@@ -15,7 +19,7 @@ export class StringParser extends BaseParser {
 		if (schema.minLength !== undefined && value.length < schema.minLength) {
 			throw new EnvironmentValidationError(
 				context.envKey,
-				`Value length (${value.length}) is less than minimum length (${schema.minLength})`,
+				`String too short. Length (${value.length}) must be at least ${schema.minLength}`,
 				context.path
 			);
 		}
@@ -23,7 +27,7 @@ export class StringParser extends BaseParser {
 		if (schema.maxLength !== undefined && value.length > schema.maxLength) {
 			throw new EnvironmentValidationError(
 				context.envKey,
-				`Value length (${value.length}) exceeds maximum length (${schema.maxLength})`,
+				`String too long. Length (${value.length}) must not exceed ${schema.maxLength}`,
 				context.path
 			);
 		}
@@ -34,12 +38,13 @@ export class StringParser extends BaseParser {
 			if (!pattern.test(value)) {
 				throw new EnvironmentValidationError(
 					context.envKey,
-					`Value does not match pattern: ${pattern}`,
+					`Value does not match required pattern: ${pattern}`,
 					context.path
 				);
 			}
 		}
+
 		this.runCustomValidator(schema.validator, value, context);
-		this._debug.trace(`Validated string for key: ${context.envKey}, value: ${value}`);
+		this._debug.trace(`String validation passed for key: ${context.envKey}`);
 	}
 }

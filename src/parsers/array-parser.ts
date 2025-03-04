@@ -3,14 +3,23 @@ import { ArraySchema, ParserContext, ParserResult } from '../types';
 import { BaseParser } from './base-parser';
 import { ParserRegistry } from './parser-registry';
 
-export class ArrayParser extends BaseParser {
+export class ArrayParser extends BaseParser<unknown[]> {
 	constructor(private readonly registry: ParserRegistry) {
 		super();
 	}
 
 	parse(context: ParserContext): ParserResult {
-		this._debug.info('Parsing array', context);
+		this._debug.info(`Parsing array for key: ${context.envKey}`);
 
+		const parsed = this.parseJsonArray(context);
+		const validatedArray = this.validateAndParseItems(parsed, context);
+		const transformedValue = this.transform(validatedArray, context);
+
+		this._debug.info(`Parsed array successfully: ${transformedValue}`);
+		return { value: transformedValue };
+	}
+
+	private parseJsonArray(context: ParserContext): unknown[] {
 		let parsed: unknown;
 		try {
 			parsed = JSON.parse(context.value);
@@ -25,16 +34,21 @@ export class ArrayParser extends BaseParser {
 			throw new EnvironmentParseError(context.envKey, 'Not a valid JSON array', context.path);
 		}
 
+		return parsed;
+	}
+
+	private validateAndParseItems(items: unknown[], context: ParserContext): unknown[] {
 		const arraySchema = context.schema as ArraySchema;
-		const value = parsed.map((item, index) => {
+
+		this.validateArrayLength(items, arraySchema, context);
+
+		const parsedItems = items.map((item, index) => {
 			const itemCtx: ParserContext = {
 				envKey: `${context.envKey}[${index}]`,
 				path: [...context.path, index.toString()],
 				schema: arraySchema.items,
 				value: JSON.stringify(item)
 			};
-
-			this._debug.info(`Parsing array item at index ${index}`, itemCtx);
 
 			try {
 				const parsedItem = this.registry.parse(itemCtx).value;
@@ -50,31 +64,25 @@ export class ArrayParser extends BaseParser {
 			}
 		});
 
-		this.validate(value, arraySchema, context);
-		const transformedValue = this.transform(value, context);
-		this._debug.info('Transformed array successfully', transformedValue);
-		this._debug.info('Parsed array successfully', value);
-		return { value: transformedValue };
+		this.runCustomValidator(arraySchema.validator, parsedItems, context);
+		return parsedItems;
 	}
 
-	private validate(value: unknown[], schema: ArraySchema, context: ParserContext): void {
-		if (schema.minItems !== undefined && value.length < schema.minItems) {
+	private validateArrayLength(items: unknown[], schema: ArraySchema, context: ParserContext): void {
+		if (schema.minItems !== undefined && items.length < schema.minItems) {
 			throw new EnvironmentValidationError(
 				context.envKey,
-				`Array length (${value.length}) is less than minimum length (${schema.minItems})`,
+				`Array must have at least ${schema.minItems} items (current: ${items.length})`,
 				context.path
 			);
 		}
 
-		if (schema.maxItems !== undefined && value.length > schema.maxItems) {
+		if (schema.maxItems !== undefined && items.length > schema.maxItems) {
 			throw new EnvironmentValidationError(
 				context.envKey,
-				`Array length (${value.length}) exceeds maximum length (${schema.maxItems})`,
+				`Array must not exceed ${schema.maxItems} items (current: ${items.length})`,
 				context.path
 			);
 		}
-
-		this.runCustomValidator(schema.validator, value, context);
-		this._debug.trace(`Validated array for key: ${context.envKey}, value: ${value}`);
 	}
 }

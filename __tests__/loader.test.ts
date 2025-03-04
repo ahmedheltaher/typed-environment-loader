@@ -7,7 +7,7 @@ describe('EnvironmentLoader', () => {
 
 	beforeEach(() => {
 		mockParserRegistry = {
-			parse: jest.fn(),
+			parse: jest.fn()
 		} as any;
 		(ParserRegistry as jest.Mock).mockImplementation(() => mockParserRegistry);
 	});
@@ -20,17 +20,17 @@ describe('EnvironmentLoader', () => {
 		it('should load flat schema successfully', () => {
 			const env = {
 				TEST_STRING: 'value',
-				TEST_NUMBER: '123',
+				TEST_NUMBER: '123'
 			};
 
 			const schema = {
 				testString: { type: 'string', required: true, name: 'TEST_STRING' },
-				testNumber: { type: 'number', required: true, name: 'TEST_NUMBER' },
+				testNumber: { type: 'number', required: true, name: 'TEST_NUMBER' }
 			} satisfies EnvironmentSchema;
 
 			// Since entries are processed in reverse order, we need to mock in reverse
 			mockParserRegistry.parse
-				.mockReturnValueOnce({ value: 123 })      // testNumber (processed first)
+				.mockReturnValueOnce({ value: 123 }) // testNumber (processed first)
 				.mockReturnValueOnce({ value: 'value' }); // testString (processed second)
 
 			const loader = new EnvironmentLoader(schema, env);
@@ -38,7 +38,7 @@ describe('EnvironmentLoader', () => {
 
 			expect(result).toStrictEqual({
 				testString: 'value',
-				testNumber: 123,
+				testNumber: 123
 			});
 
 			// Verify the order of calls
@@ -51,23 +51,23 @@ describe('EnvironmentLoader', () => {
 			const env = {
 				DATABASE_HOST: 'localhost',
 				DATABASE_PORT: '5432',
-				API_URL: 'http://api.example.com',
+				API_URL: 'http://api.example.com'
 			};
 
 			const schema = {
 				database: {
 					host: { type: 'string', required: true, name: 'DATABASE_HOST' },
-					port: { type: 'number', required: true, name: 'DATABASE_PORT' },
+					port: { type: 'number', required: true, name: 'DATABASE_PORT' }
 				},
 				api: {
-					url: { type: 'string', required: true, name: 'API_URL' },
-				},
+					url: { type: 'string', required: true, name: 'API_URL' }
+				}
 			} satisfies EnvironmentSchema;
 
 			// Mock in reverse order of processing
 			mockParserRegistry.parse
-				.mockReturnValueOnce({ value: 5432 })                      // database.port
-				.mockReturnValueOnce({ value: 'localhost' })               // database.host
+				.mockReturnValueOnce({ value: 5432 }) // database.port
+				.mockReturnValueOnce({ value: 'localhost' }) // database.host
 				.mockReturnValueOnce({ value: 'http://api.example.com' }); // api.url
 
 			const loader = new EnvironmentLoader(schema, env);
@@ -76,11 +76,11 @@ describe('EnvironmentLoader', () => {
 			expect(result).toStrictEqual({
 				database: {
 					host: 'localhost',
-					port: 5432,
+					port: 5432
 				},
 				api: {
-					url: 'http://api.example.com',
-				},
+					url: 'http://api.example.com'
+				}
 			});
 
 			// Verify the order of calls
@@ -90,11 +90,11 @@ describe('EnvironmentLoader', () => {
 		// Rest of the tests remain the same...
 		it('should handle custom environment key names', () => {
 			const env = {
-				CUSTOM_ENV_KEY: 'value',
+				CUSTOM_ENV_KEY: 'value'
 			};
 
 			const schema = {
-				test: { type: 'string', required: true, name: 'CUSTOM_ENV_KEY' },
+				test: { type: 'string', required: true, name: 'CUSTOM_ENV_KEY' }
 			} satisfies EnvironmentSchema;
 
 			mockParserRegistry.parse.mockReturnValueOnce({ value: 'value' });
@@ -103,7 +103,7 @@ describe('EnvironmentLoader', () => {
 			const result = loader.load();
 
 			expect(result).toEqual({
-				test: 'value',
+				test: 'value'
 			});
 		});
 
@@ -112,7 +112,12 @@ describe('EnvironmentLoader', () => {
 
 			const schema = {
 				test: { type: 'string', required: false, default: 'default value' },
-				arrayTest: { type: 'array', required: false, default: ['default'], items: { type: 'string' } },
+				arrayTest: {
+					type: 'array',
+					required: false,
+					default: ['default'],
+					items: { type: 'string' }
+				}
 			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);
@@ -120,7 +125,7 @@ describe('EnvironmentLoader', () => {
 
 			expect(result).toEqual({
 				test: 'default value',
-				arrayTest: ['default'],
+				arrayTest: ['default']
 			});
 		});
 
@@ -128,7 +133,7 @@ describe('EnvironmentLoader', () => {
 			const env = {};
 
 			const schema = {
-				test: { type: 'string', required: true },
+				test: { type: 'string', required: true }
 			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);
@@ -138,11 +143,11 @@ describe('EnvironmentLoader', () => {
 
 		it('should handle empty string values', () => {
 			const env = {
-				TEST_STRING: '  ',
+				TEST_STRING: '  '
 			};
 
 			const schema = {
-				testString: { type: 'string', required: true },
+				testString: { type: 'string', required: true }
 			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);
@@ -154,7 +159,12 @@ describe('EnvironmentLoader', () => {
 			const env = {};
 
 			const schema = {
-				array: { type: 'array', required: false, default: [1, 2, 3], items: { type: 'number' } },
+				array: {
+					type: 'array',
+					required: false,
+					default: [1, 2, 3],
+					items: { type: 'number' }
+				}
 			} satisfies EnvironmentSchema;
 
 			const loader = new EnvironmentLoader(schema, env);

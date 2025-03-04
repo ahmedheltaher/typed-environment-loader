@@ -12,12 +12,14 @@ describe('ArrayParser', () => {
 		parser = new ArrayParser(registry);
 	});
 
-
 	it('should throw EnvironmentParseError if context value is not a valid JSON array', () => {
 		const context: ParserContext = {
 			envKey: 'TEST_KEY',
 			path: [],
-			schema: { type: 'array', items: { type: 'string' } },
+			schema: {
+				type: 'array',
+				items: { type: 'string' }
+			},
 			value: 'not-an-array'
 		};
 
@@ -28,11 +30,16 @@ describe('ArrayParser', () => {
 		const context: ParserContext = {
 			envKey: 'TEST_KEY',
 			path: [],
-			schema: { type: 'array', items: { type: 'string' } },
+			schema: {
+				type: 'array',
+				items: { type: 'string' }
+			},
 			value: '["item1", "item2"]'
 		};
 
-		jest.spyOn(registry, 'parse').mockImplementation((context) => ({ value: context.value ? context.value.replace(/"/g, '') : '' }));
+		jest.spyOn(registry, 'parse').mockImplementation(context => ({
+			value: context.value ? context.value.replace(/"/g, '') : ''
+		}));
 
 		const result = parser.parse(context);
 		expect(result.value).toEqual(['item1', 'item2']);
@@ -42,11 +49,14 @@ describe('ArrayParser', () => {
 		const context: ParserContext = {
 			envKey: 'TEST_KEY',
 			path: [],
-			schema: { type: 'array', items: { type: 'string' } },
+			schema: {
+				type: 'array',
+				items: { type: 'string' }
+			},
 			value: '["item1", 123]'
 		};
 
-		jest.spyOn(registry, 'parse').mockImplementation((context) => {
+		jest.spyOn(registry, 'parse').mockImplementation(context => {
 			if (context.value === '123') {
 				throw new Error('Invalid item');
 			}

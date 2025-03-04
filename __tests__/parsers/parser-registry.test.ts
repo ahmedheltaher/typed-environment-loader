@@ -19,8 +19,9 @@ describe('ParserRegistry', () => {
 
 	it('should allow registering a new parser', () => {
 		class CustomParser {
-			constructor(private registry: ParserRegistry) { }
-			parse(context: ParserContext): ParserResult {
+			constructor(private registry: ParserRegistry) {}
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			parse(_context: ParserContext): ParserResult {
 				return { value: 'custom' };
 			}
 		}
