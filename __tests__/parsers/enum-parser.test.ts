@@ -25,7 +25,7 @@ describe('EnumParser', () => {
 
 		expect(() => parser.parse(context)).toThrow(EnvironmentValidationError);
 		expect(() => parser.parse(context)).toThrow(
-			'Invalid value for : Invalid value. Allowed values are: value1, value2, value3'
+			'Invalid value for TEST_KEY: Invalid value. Allowed values are: value1, value2, value3'
 		);
 	});
 

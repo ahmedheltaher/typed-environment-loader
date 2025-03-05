@@ -40,7 +40,7 @@ describe('BooleanParser', () => {
 		};
 		expect(() => parser.parse(context)).toThrow(EnvironmentValidationError);
 		expect(() => parser.parse(context)).toThrow(
-			'Invalid value for : Invalid boolean value. Must be one of: true, 1, yes, y, on, false, 0, no, n, off'
+			'Invalid value for TEST_KEY: Invalid boolean value. Must be one of: [true, 1, yes, y, on, false, 0, no, n, off]'
 		);
 	});
 });

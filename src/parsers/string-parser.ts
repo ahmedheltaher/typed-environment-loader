@@ -5,17 +5,17 @@ import { BaseParser } from './base-parser';
 export class StringParser extends BaseParser<string> {
 	parse(context: ParserContext): ParserResult {
 		const value = this.removeQuotes(context.value);
-		const stringSchema = context.schema as StringSchema;
-
 		this._debug.info(`Parsing string for key: ${context.envKey}, value: ${value}`);
 
-		this.validate(value, stringSchema, context);
+		this.validate(context, value);
 		const transformedValue = this.transform(value, context);
 
 		return { value: transformedValue };
 	}
 
-	private validate(value: string, schema: StringSchema, context: ParserContext): void {
+	private validate(context: ParserContext, value: string): void {
+		const schema = context.schema as StringSchema;
+
 		if (schema.minLength !== undefined && value.length < schema.minLength) {
 			throw new EnvironmentValidationError(
 				context.envKey,

@@ -6,7 +6,7 @@ export class BooleanParser extends BaseParser<boolean> {
 	parse(context: ParserContext): ParserResult {
 		this._debug.info(`Parsing boolean for key: ${context.envKey}, value: ${context.value}`);
 
-		const normalized = this.normalizeBoolean(context.value);
+		const normalized = this.normalizeBoolean(context);
 
 		const transformedValue = this.transform(normalized, context);
 
@@ -14,8 +14,8 @@ export class BooleanParser extends BaseParser<boolean> {
 		return { value: transformedValue };
 	}
 
-	private normalizeBoolean(value: string): boolean {
-		const normalized = value.trim().toLowerCase();
+	private normalizeBoolean(context: ParserContext): boolean {
+		const normalized = context.value.trim().toLowerCase();
 
 		const trueValues = ['true', '1', 'yes', 'y', 'on'];
 		const falseValues = ['false', '0', 'no', 'n', 'off'];
@@ -29,9 +29,9 @@ export class BooleanParser extends BaseParser<boolean> {
 		}
 
 		throw new EnvironmentValidationError(
-			'',
-			`Invalid boolean value. Must be one of: ${[...trueValues, ...falseValues].join(', ')}`,
-			[]
+			context.envKey,
+			`Invalid boolean value. Must be one of: [${[...trueValues, ...falseValues].join(', ')}]`,
+			context.path
 		);
 	}
 }

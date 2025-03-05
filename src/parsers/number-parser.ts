@@ -9,12 +9,10 @@ export class NumberParser extends BaseParser<number> {
 		const value = this.removeQuotes(context.value);
 		this._debug.info(`Value after removing quotes: ${value}`);
 
-		const num = this.parseNumber(value, context);
+		const parsedValue = this.parseNumber(value, context);
+		this.validate(context, parsedValue);
 
-		const numberSchema = context.schema as NumberSchema;
-		this.validate(num, numberSchema, context);
-
-		const transformedValue = this.transform(num, context);
+		const transformedValue = this.transform(parsedValue, context);
 		this._debug.info(`Parsed number for key: ${context.envKey}, value: ${transformedValue}`);
 
 		return { value: transformedValue };
@@ -39,7 +37,9 @@ export class NumberParser extends BaseParser<number> {
 		return num;
 	}
 
-	private validate(value: number, schema: NumberSchema, context: ParserContext): void {
+	private validate(context: ParserContext, value: number): void {
+		const schema = context.schema as NumberSchema;
+
 		if (schema.min !== undefined && value < schema.min) {
 			throw new EnvironmentValidationError(
 				context.envKey,
