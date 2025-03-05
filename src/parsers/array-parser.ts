@@ -11,12 +11,20 @@ export class ArrayParser extends BaseParser<unknown[]> {
 	parse(context: ParserContext): ParserResult {
 		this._debug.info(`Parsing array for key: ${context.envKey}`);
 
-		const parsed = this.parseJsonArray(context);
+		const parsed = this.parseArray(context);
 		const validatedArray = this.validateAndParseItems(parsed, context);
 		const transformedValue = this.transform(validatedArray, context);
 
 		this._debug.info(`Parsed array successfully: ${transformedValue}`);
 		return { value: transformedValue };
+	}
+
+	private parseArray(context: ParserContext) {
+		const schema = context.schema as ArraySchema;
+		if (schema.format === 'csv') {
+			return context.value.split(schema.itemSeparator || ',');
+		}
+		return this.parseJsonArray(context);
 	}
 
 	private parseJsonArray(context: ParserContext): unknown[] {

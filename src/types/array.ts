@@ -12,4 +12,6 @@ export interface ArraySchema<Type = unknown> extends BaseSchema {
 	maxItems?: number;
 	validator?: Validator<any>;
 	transform?: Transform<any>;
+	format?: 'json' | 'csv';
+	itemSeparator?: string;
 }

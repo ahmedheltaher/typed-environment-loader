@@ -2,7 +2,7 @@ import { createDebugLogger } from '../debug';
 import { EnvironmentTransformError, EnvironmentValidationError } from '../errors';
 import { Parser, ParserContext, ParserResult, TransformFunction, Validator } from '../types';
 
-export abstract class BaseParser<T = unknown> implements Parser {
+export abstract class BaseParser<Type = unknown> implements Parser {
 	protected readonly _debug = createDebugLogger(this.constructor.name);
 
 	protected removeQuotes(value: string): string {
@@ -12,7 +12,7 @@ export abstract class BaseParser<T = unknown> implements Parser {
 
 	abstract parse(context: ParserContext): ParserResult;
 
-	protected transform(value: T, context: ParserContext): T {
+	protected transform(value: Type, context: ParserContext): Type {
 		this._debug.trace(`Transforming value: ${value}`);
 		const schema = context.schema;
 
@@ -22,8 +22,8 @@ export abstract class BaseParser<T = unknown> implements Parser {
 
 		const transformFunction =
 			typeof schema.transform === 'function' ?
-				(schema.transform as TransformFunction<T>)
-			:	(schema.transform.function as TransformFunction<T>);
+				(schema.transform as TransformFunction<Type>)
+			:	(schema.transform.function as TransformFunction<Type>);
 
 		try {
 			const transformedValue = transformFunction(value);
@@ -36,7 +36,7 @@ export abstract class BaseParser<T = unknown> implements Parser {
 		}
 	}
 
-	protected runCustomValidator(validator: Validator<T> | undefined, value: T, context: ParserContext): void {
+	protected runCustomValidator(validator: Validator<Type> | undefined, value: Type, context: ParserContext): void {
 		if (!validator) return;
 
 		const validatorFunction = typeof validator === 'function' ? validator : validator.function;
